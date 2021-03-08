@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/contact_avatar_height"
+    android:layout_margin="@dimen/contact_details_list_margin"
+    android:id="@+id/contact_layout_card">
+
+    <ImageView
+        android:id="@+id/contact_img_avatar"
+        android:layout_width="@dimen/contact_avatar_width"
+        android:layout_height="@dimen/contact_avatar_height"
+        android:layout_marginEnd="@dimen/contact_main_info_margin"
+        app:srcCompat="@drawable/ic_account_box_black_24dp" />
+
+    <TextView
+        android:id="@+id/contact_txt_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/contact_main_info_margin"
+        android:layout_toEndOf="@+id/contact_img_avatar"
+        android:gravity="center_vertical"
+        android:text="@string/contact_name"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="@dimen/contact_name_text" />
+
+    <TextView
+        android:id="@+id/contact_txt_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/contact_txt_name"
+        android:layout_toEndOf="@+id/contact_img_avatar"
+        android:text="@string/contact_first_number"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="@dimen/contact_info_text" />
+
+</RelativeLayout>
