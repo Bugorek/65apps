@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/contact_layout_card"
     android:layout_width="match_parent"
     android:layout_height="@dimen/contact_avatar_height"
     android:layout_margin="@dimen/contact_details_list_margin"
-    android:id="@+id/contact_layout_card">
+    android:visibility="gone">
 
     <ImageView
         android:id="@+id/contact_img_avatar"
@@ -20,7 +21,6 @@
         android:layout_marginBottom="@dimen/contact_main_info_margin"
         android:layout_toEndOf="@+id/contact_img_avatar"
         android:gravity="center_vertical"
-        android:text="@string/contact_name"
         android:fontFamily="sans-serif-medium"
         android:textSize="@dimen/contact_name_text" />
 
@@ -30,7 +30,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/contact_txt_name"
         android:layout_toEndOf="@+id/contact_img_avatar"
-        android:text="@string/contact_first_number"
         android:fontFamily="sans-serif-medium"
         android:textSize="@dimen/contact_info_text" />
 
