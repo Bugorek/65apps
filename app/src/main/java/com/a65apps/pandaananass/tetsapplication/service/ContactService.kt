@@ -1,5 +1,6 @@
 package com.a65apps.pandaananass.tetsapplication.service
 
+
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
@@ -19,14 +20,18 @@ class ContactService : Service() {
     }
 
     fun getFullContactData(fragment: WeakReference<ContactDetailsFragment>, id: Int) {
-        Thread{
+        Thread {
             kotlin.run {
                 Thread.sleep(2000)
                 val contactList: List<FullContactModel> = listOf(
                         FullContactModel(id = id, name = "Igor Kamashev",
-                                firstNumber = "89991892440", secondNumber = "89991892441",
-                                firstMail = "1@gmail.com", secondMail = "2@gmail.com",
-                                description = "Description"))
+                                firstNumber = "89991892440",
+                                secondNumber = "89991892441",
+                                firstMail = "1@gmail.com",
+                                secondMail = "2@gmail.com",
+                                description = "Description",
+                                dayOfBirth = 22,
+                                monthOfBirth = 3))
                 contactList.forEach {
                     if (it.id == id) {
                         fragment.get()?.setContactDetails(it)
@@ -37,7 +42,7 @@ class ContactService : Service() {
     }
 
     fun getShortContactData(fragment: WeakReference<ContactListFragment>) {
-        Thread{
+        Thread {
             kotlin.run {
                 Thread.sleep(2000)
                 val contactList: List<ShortContactModel> = listOf(ShortContactModel(id = 1,
@@ -48,7 +53,7 @@ class ContactService : Service() {
         }.start()
     }
 
-    inner class SimpleBinder: Binder() {
+    inner class SimpleBinder : Binder() {
         fun getService(): ContactService = this@ContactService
     }
 }

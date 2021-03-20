@@ -39,7 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/txt_contact_first_number"
         android:layout_marginTop="@dimen/contact_details_list_margin"
-        android:text="@string/contact_second_number"
         android:fontFamily="sans-serif-medium"
         android:textSize="@dimen/contact_info_text" />
 
@@ -58,7 +57,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/txt_contact_first_separator"
         android:layout_marginTop="@dimen/contact_details_list_margin"
-        android:text="@string/contact_first_mail"
         android:fontFamily="sans-serif-medium"
         android:textSize="@dimen/contact_info_text" />
 
@@ -68,7 +66,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/txt_contact_first_mail"
         android:layout_marginTop="@dimen/contact_details_list_margin"
-        android:text="@string/contact_second_mail"
         android:fontFamily="sans-serif-medium"
         android:textSize="@dimen/contact_info_text" />
 
@@ -90,6 +87,26 @@
         android:scrollbars="vertical"
         android:layout_marginTop="@dimen/contact_details_list_margin"
         android:layout_below="@+id/txt_contact_second_separator"
+        android:textSize="@dimen/contact_info_text" />
+
+    <TextView
+        android:id="@+id/txt_contact_birthday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_contact_description"
+        android:layout_marginTop="@dimen/contact_details_list_margin"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="@dimen/contact_info_text" />
+
+    <Button
+        android:id="@+id/btn_contact_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/fragment_contact_add_btn_txt"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginTop="@dimen/contact_details_list_margin"
+        android:layout_below="@+id/txt_contact_birthday"
+        android:layout_centerHorizontal="true"
         android:textSize="@dimen/contact_info_text" />
 
 </RelativeLayout>
