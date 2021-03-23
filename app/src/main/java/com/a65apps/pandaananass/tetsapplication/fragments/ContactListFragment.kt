@@ -2,19 +2,18 @@ package com.a65apps.pandaananass.tetsapplication.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
 import com.a65apps.pandaananass.tetsapplication.R
+import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
 import com.a65apps.pandaananass.tetsapplication.interfaces.ContactServiceInterface
 import com.a65apps.pandaananass.tetsapplication.interfaces.RelativeLayoutClickListener
 import com.a65apps.pandaananass.tetsapplication.interfaces.ServiceOwner
 import com.a65apps.pandaananass.tetsapplication.models.ShortContactModel
-import com.a65apps.pandaananass.tetsapplication.service.ContactService
 import java.lang.ref.WeakReference
 
 const val FRAGMENT_LIST_NAME = "ContactListFragment"

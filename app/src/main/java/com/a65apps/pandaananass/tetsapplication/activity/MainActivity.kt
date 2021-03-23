@@ -4,19 +4,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar;
 import android.os.Bundle
 import android.os.IBinder
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentTransaction
 import com.a65apps.pandaananass.tetsapplication.R
-import com.a65apps.pandaananass.tetsapplication.interfaces.RelativeLayoutClickListener
 import com.a65apps.pandaananass.tetsapplication.fragments.ContactDetailsFragment
 import com.a65apps.pandaananass.tetsapplication.fragments.ContactListFragment
 import com.a65apps.pandaananass.tetsapplication.fragments.FRAGMENT_DETAILS_NAME
 import com.a65apps.pandaananass.tetsapplication.fragments.FRAGMENT_LIST_NAME
+import com.a65apps.pandaananass.tetsapplication.interfaces.RelativeLayoutClickListener
 import com.a65apps.pandaananass.tetsapplication.interfaces.ServiceOwner
 import com.a65apps.pandaananass.tetsapplication.service.ContactService
+
+private const val ARGUMENT_ID = "Id"
 
 class MainActivity : AppCompatActivity(), RelativeLayoutClickListener, ServiceOwner {
 
@@ -43,6 +45,7 @@ class MainActivity : AppCompatActivity(), RelativeLayoutClickListener, ServiceOw
             bound = false
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -50,9 +53,23 @@ class MainActivity : AppCompatActivity(), RelativeLayoutClickListener, ServiceOw
         setSupportActionBar(toolBar)
         val intent = Intent(this, ContactService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        val contactId = getIntent().getIntExtra(ARGUMENT_ID, -1)
         if (savedInstanceState == null) {
             openContactList()
         }
+        if (contactId != -1) {
+            openContactDetails(contactId)
+            getIntent().removeExtra(ARGUMENT_ID)
+        }
+    }
+
+    override fun onDestroy() {
+        if (bound) {
+            unbindService(connection)
+            bound = false
+        }
+        contactService = null
+        super.onDestroy()
     }
 
     private fun openContactList() {
@@ -68,15 +85,6 @@ class MainActivity : AppCompatActivity(), RelativeLayoutClickListener, ServiceOw
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit()
-    }
-
-    override fun onDestroy() {
-        if (bound) {
-            unbindService(connection)
-            bound = false
-        }
-        contactService = null
-        super.onDestroy()
     }
 
     override fun onLayoutClick(id: Int) {
