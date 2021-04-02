@@ -7,11 +7,12 @@
     <string name="fragment_contact_add_btn_txt">Включить напоминание</string>
     <string name="fragment_contact_delete_btn_txt">Выключить напоминание</string>
     <string name="receiver_birthday_message">Сегодня день рождение у</string>
-    <string name="fragment_contact_details_birthday">Дата рождения: %1$s.%2$d</string>
+    <string name="fragment_contact_details_birthday">Дата рождения: %1$d.%2$d</string>
     <string name="fragment_contact_details_empty_birthday">Дата рождения отсутствует</string>
     <string name="notification_title">День рождения</string>
-    <string name="permission_dialog_message">Для отображения списка контактов в данном приложении требуется дать доступ к списку ваших контактов</string>
-    <string name="permission_toast_message">Приложение не может показать список контактов без доступа к данным ваших контактов</string>
+    <string name="permission_dialog_message">Для отображения контактов в данном приложении требуется дать доступ к списку ваших контактов</string>
+    <string name="no_permission_message">Приложение не может показать данные контактов без доступа к данным ваших контактов</string>
+    <string name="contact_empty_list">Список контактов пуст</string>
     <string name="permission_dialog_positive_button">Ок</string>
     <string name="permission_dialog_negative_button">Отмена</string>
     <string name="notification_action">com.a65apps.pandaananass.tetsapplication.receivers</string>

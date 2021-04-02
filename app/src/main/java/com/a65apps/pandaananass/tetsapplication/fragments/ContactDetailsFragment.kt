@@ -1,10 +1,8 @@
 package com.a65apps.pandaananass.tetsapplication.fragments
 
-import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
@@ -14,26 +12,26 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
-import com.a65apps.pandaananass.tetsapplication.interfaces.ContactServiceInterface
-import com.a65apps.pandaananass.tetsapplication.interfaces.ServiceOwner
+import com.a65apps.pandaananass.tetsapplication.interfaces.PermissionDialogClickListener
 import com.a65apps.pandaananass.tetsapplication.models.FullContactModel
-import com.a65apps.pandaananass.tetsapplication.receivers.AlarmReceiver
-import java.lang.ref.WeakReference
-import java.util.Calendar
-import java.util.Locale
-import java.util.TimeZone
+import com.a65apps.pandaananass.tetsapplication.presenters.ContactDetailsPresenter
+import com.a65apps.pandaananass.tetsapplication.views.ContactDetailsView
+import com.arellomobile.mvp.MvpAppCompatFragment
+import com.arellomobile.mvp.presenter.InjectPresenter
 
 private const val ARGUMENT_ID = "Id"
-private const val ARGUMENT_NAME = "Name"
 const val FRAGMENT_DETAILS_NAME = "ContactDetailsFragment"
 
-class ContactDetailsFragment : Fragment(), ContactServiceInterface {
+class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, PermissionDialogClickListener {
 
-    private var serviceOwner: ServiceOwner? = null
+    @InjectPresenter
+    lateinit var contactDetailsPresenter: ContactDetailsPresenter
+
     private var rlContact: RelativeLayout? = null
     private var txtName: TextView? = null
     private var txtFirstNumber: TextView? = null
@@ -44,8 +42,21 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
     private var txtBirthday: TextView? = null
     private var btnNotification: Button? = null
     private var imgContactAvatar: ImageView? = null
+    private var txtNoPermission: TextView? = null
     private var contactMonthOfBirth: Int? = null
     private var contactDayOfBirth: Int? = null
+    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            val contactId = arguments?.getString(ARGUMENT_ID)
+            contactId?.let { contactDetailsPresenter.getContactData(context = requireContext(), id = it) }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_CONTACTS)) {
+                contactDetailsPresenter.showPermissionDialog(activity = requireActivity())
+            } else {
+                contactDetailsPresenter.setNoPermission()
+            }
+        }
+    }
 
     companion object {
         fun getNewInstance(id: String): ContactDetailsFragment {
@@ -54,13 +65,6 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
             args.putString(ARGUMENT_ID, id)
             contactDetailsFragment.arguments = args
             return contactDetailsFragment
-        }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is ServiceOwner) {
-            serviceOwner = context
         }
     }
 
@@ -85,26 +89,10 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
         txtBirthday = view.findViewById(R.id.txt_contact_birthday)
         imgContactAvatar = view.findViewById(R.id.img_contact_avatar)
         btnNotification = view.findViewById(R.id.btn_contact_notification)
-        val contactId = arguments?.getString(ARGUMENT_ID)
-        btnNotification?.setOnClickListener {
-            if (notificationStatus(intent = getIntent(), id = contactId)) {
-                deleteNotification(intent = getIntent(), id = contactId)
-            } else {
-                setNotification(intent = getIntent(), id = contactId)
-            }
-        }
-        if (notificationStatus(intent = getIntent(), id = contactId)) {
-            btnNotification?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red))
-            btnNotification?.text = getString(R.string.fragment_contact_delete_btn_txt)
-        } else {
-            btnNotification?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
-            btnNotification?.text = getString(R.string.fragment_contact_add_btn_txt)
-        }
+        txtNoPermission = view.findViewById(R.id.txt_contact_details_no_permission)
         txtDescription?.movementMethod = ScrollingMovementMethod()
         mainActivity.title = resources.getString(R.string.fragment_contact_details_title)
-        if (savedInstanceState == null) {
-            getContactData()
-        }
+        getPermission()
     }
 
     override fun onDestroyView() {
@@ -116,97 +104,94 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
         txtDescription = null
         rlContact = null
         imgContactAvatar = null
+        txtNoPermission = null
         contactMonthOfBirth = null
         contactDayOfBirth = null
         super.onDestroyView()
     }
 
-    override fun onDetach() {
-        serviceOwner = null
-        super.onDetach()
+    override fun getContactData() {
+        arguments?.getString(ARGUMENT_ID)?.let {
+            contactDetailsPresenter.getContactData(requireContext(), id = it)
+        }
     }
 
-    @SuppressLint("StringFormatMatches")
-    fun setContactDetails(contactModel: FullContactModel) {
+    override fun setContactData(contactModel: FullContactModel) {
         activity?.runOnUiThread {
-            contactMonthOfBirth = contactModel.monthOfBirth
-            contactDayOfBirth = contactModel.dayOfBirth
             txtName?.text = contactModel.name
             txtFirstNumber?.text = contactModel.firstNumber
             txtFirstMail?.text = contactModel.firstMail
             txtSecondNumber?.text = contactModel.secondNumber
             txtSecondMail?.text = contactModel.secondMail
             txtDescription?.text = contactModel.description
-            if (contactModel.dayOfBirth != null) {
-                txtBirthday?.text = getString(R.string.fragment_contact_details_birthday, contactDayOfBirth, contactMonthOfBirth)
-            } else {
-                txtBirthday?.text = getString(R.string.fragment_contact_details_empty_birthday)
-                btnNotification?.visibility = View.GONE
-            }
-
             imgContactAvatar?.setImageURI(contactModel.photo)
+        }
+    }
+
+    override fun noBirthday() {
+        txtBirthday?.text = getString(R.string.fragment_contact_details_empty_birthday)
+        btnNotification?.visibility = View.GONE
+        rlContact?.visibility = View.VISIBLE
+    }
+
+    override fun setBirthday(contactModel: FullContactModel) {
+        activity?.runOnUiThread {
+            val contactId = arguments?.getString(ARGUMENT_ID) ?: throw IllegalArgumentException("contact id is required")
+            btnNotification?.setOnClickListener {
+                contactDetailsPresenter.notificationClick(context = requireContext(),
+                        contactId = contactId,
+                        contactName = txtName?.text.toString(),
+                        monthOfBirth = contactModel.monthOfBirth,
+                        dayOfBirth = contactModel.dayOfBirth
+                )
+            }
+            contactDetailsPresenter.notificationButtonStyle(context = requireContext(),
+                    contactId = contactId,
+                    contactName = txtName?.text.toString())
+            txtBirthday?.text = getString(R.string.fragment_contact_details_birthday, contactModel.dayOfBirth, contactModel.monthOfBirth)
             rlContact?.visibility = View.VISIBLE
         }
     }
 
-    override fun getContactData() {
-        val weakFragment = WeakReference(this)
-        arguments?.getString(ARGUMENT_ID)?.let {
-            serviceOwner?.getService()?.getFullContactData(weakFragment, it)
-        }
-    }
-
-    private fun setNotification(intent: Intent, id: String?) {
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pendingIntent = id?.let { it -> PendingIntent.getBroadcast(requireContext(), it.hashCode(), intent, 0) }
-        if (contactMonthOfBirth != null && contactDayOfBirth != null) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, birthdayCalendar(dayOfBirth = contactDayOfBirth!!, monthOfBirth = contactMonthOfBirth!!).timeInMillis, pendingIntent)
-        }
+    override fun notificationSet() {
         btnNotification?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red))
         btnNotification?.text = getString(R.string.fragment_contact_delete_btn_txt)
     }
 
-    private fun deleteNotification(intent: Intent, id: String?) {
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pendingIntent = id?.let { it -> PendingIntent.getBroadcast(requireContext(), it.hashCode(), intent, 0) }
-        alarmManager.cancel(pendingIntent)
-        pendingIntent?.cancel()
+    override fun notificationNotSet() {
         btnNotification?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
         btnNotification?.text = getString(R.string.fragment_contact_add_btn_txt)
     }
 
-    private fun notificationStatus(intent: Intent, id: String?): Boolean {
-        val status = id?.let { PendingIntent.getBroadcast(requireContext(), it.hashCode(), intent, PendingIntent.FLAG_NO_CREATE) }
-        return status != null
+    override fun setNoPermission() {
+        txtNoPermission?.visibility = View.VISIBLE
     }
 
-    private fun birthdayCalendar(dayOfBirth: Int, monthOfBirth: Int): Calendar {
-        val calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault())
-        val day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-        val month = Calendar.getInstance().get(Calendar.MONTH)
-        val year = Calendar.getInstance().get(Calendar.YEAR)
-        if (month - monthOfBirth + 1 < 0) {
-            calendar.set(Calendar.YEAR, year)
-        } else if (month - monthOfBirth + 1 == 0) {
-            if (day - dayOfBirth > 0) {
-                calendar.set(Calendar.YEAR, year + 1)
-            } else {
-                calendar.set(Calendar.YEAR, year)
+    override fun negativeClick() {
+        contactDetailsPresenter.setNoPermission()
+    }
+
+    override fun positiveClick() {
+        requestPermission.launch(Manifest.permission.READ_CONTACTS)
+    }
+
+    private fun getPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            when {
+                ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.READ_CONTACTS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    val contactId = arguments?.getString(ARGUMENT_ID)
+                    contactId?.let { contactDetailsPresenter.getContactData(context = requireContext(), id = it) }
+                }
+                ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_CONTACTS) -> {
+                    contactDetailsPresenter.showPermissionDialog(activity = requireActivity())
+                }
+                else -> {
+                    requestPermission.launch(Manifest.permission.READ_CONTACTS)
+                }
             }
-        } else {
-            calendar.set(Calendar.YEAR, year + 1)
         }
-        calendar.set(Calendar.MONTH, monthOfBirth - 1)
-        calendar.set(Calendar.DAY_OF_MONTH, dayOfBirth)
-        return calendar
-    }
-
-    private fun getIntent(): Intent {
-        val intent = Intent(requireContext(), AlarmReceiver::class.java)
-        val id = arguments?.getString(ARGUMENT_ID)
-        intent.putExtra(ARGUMENT_ID, id)
-        intent.putExtra(ARGUMENT_NAME, txtName?.text)
-        intent.action = getString(R.string.notification_action)
-        return intent
     }
 }
