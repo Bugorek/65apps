@@ -1,6 +1,11 @@
 package com.a65apps.pandaananass.tetsapplication.receivers
 
-import android.app.*
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
+import android.app.NotificationManager
+import android.app.Notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
@@ -10,23 +15,22 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
-import java.util.*
+import java.util.Calendar
 
 private const val ARGUMENT_ID = "Id"
 private const val ARGUMENT_NAME = "Name"
 private const val CHANEL_ID = "chanelID"
 private const val CHANEL_NAME = "chanelName"
-private const val ACTION = "com.a65apps.pandaananass.tetsapplication.receivers"
 
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (intent?.action == ACTION) {
-            val contactId = intent.getIntExtra(ARGUMENT_ID, -1)
-            val contactName = intent.getStringExtra(ARGUMENT_NAME)
+        if (intent?.action == context?.resources?.getString(R.string.notification_action)) {
+            val contactId = intent?.getStringExtra(ARGUMENT_ID)
+            val contactName = intent?.getStringExtra(ARGUMENT_NAME)
             val intentMain = Intent(context, MainActivity::class.java)
             val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val pendingIntent = PendingIntent.getBroadcast(context, contactId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+            val pendingIntent = PendingIntent.getBroadcast(context, contactId.hashCode(), intent, PendingIntent.FLAG_CANCEL_CURRENT)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 createChanel(context = context)
             }

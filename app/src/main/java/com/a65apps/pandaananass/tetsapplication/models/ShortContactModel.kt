@@ -1,3 +1,8 @@
 package com.a65apps.pandaananass.tetsapplication.models
 
-data class ShortContactModel(var id: Int, var name: String, var number: String)
+import android.net.Uri
+
+data class ShortContactModel(var id: String? = null,
+                             var photo: Uri? = null,
+                             var name: String? = null,
+                             var number: String? = null)

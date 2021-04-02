@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -22,11 +23,12 @@ import com.a65apps.pandaananass.tetsapplication.interfaces.ServiceOwner
 import com.a65apps.pandaananass.tetsapplication.models.FullContactModel
 import com.a65apps.pandaananass.tetsapplication.receivers.AlarmReceiver
 import java.lang.ref.WeakReference
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 
 private const val ARGUMENT_ID = "Id"
 private const val ARGUMENT_NAME = "Name"
-private const val ACTION = "com.a65apps.pandaananass.tetsapplication.receivers"
 const val FRAGMENT_DETAILS_NAME = "ContactDetailsFragment"
 
 class ContactDetailsFragment : Fragment(), ContactServiceInterface {
@@ -41,14 +43,15 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
     private var txtDescription: TextView? = null
     private var txtBirthday: TextView? = null
     private var btnNotification: Button? = null
+    private var imgContactAvatar: ImageView? = null
     private var contactMonthOfBirth: Int? = null
     private var contactDayOfBirth: Int? = null
 
     companion object {
-        fun getNewInstance(id: Int): ContactDetailsFragment {
+        fun getNewInstance(id: String): ContactDetailsFragment {
             val contactDetailsFragment = ContactDetailsFragment()
             val args = Bundle()
-            args.putInt(ARGUMENT_ID, id)
+            args.putString(ARGUMENT_ID, id)
             contactDetailsFragment.arguments = args
             return contactDetailsFragment
         }
@@ -80,15 +83,17 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
         txtSecondMail = view.findViewById(R.id.txt_contact_second_mail)
         txtDescription = view.findViewById(R.id.txt_contact_description)
         txtBirthday = view.findViewById(R.id.txt_contact_birthday)
+        imgContactAvatar = view.findViewById(R.id.img_contact_avatar)
         btnNotification = view.findViewById(R.id.btn_contact_notification)
+        val contactId = arguments?.getString(ARGUMENT_ID)
         btnNotification?.setOnClickListener {
-            if (notificationStatus(id = id)) {
-                deleteNotification(intent = getIntent(), id = id)
+            if (notificationStatus(intent = getIntent(), id = contactId)) {
+                deleteNotification(intent = getIntent(), id = contactId)
             } else {
-                setNotification(intent = getIntent(), id = id)
+                setNotification(intent = getIntent(), id = contactId)
             }
         }
-        if (notificationStatus(id = id)) {
+        if (notificationStatus(intent = getIntent(), id = contactId)) {
             btnNotification?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red))
             btnNotification?.text = getString(R.string.fragment_contact_delete_btn_txt)
         } else {
@@ -110,6 +115,7 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
         txtSecondMail = null
         txtDescription = null
         rlContact = null
+        imgContactAvatar = null
         contactMonthOfBirth = null
         contactDayOfBirth = null
         super.onDestroyView()
@@ -131,21 +137,28 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
             txtSecondNumber?.text = contactModel.secondNumber
             txtSecondMail?.text = contactModel.secondMail
             txtDescription?.text = contactModel.description
-            txtBirthday?.text = getString(R.string.fragment_contact_details_birthday, contactDayOfBirth, contactMonthOfBirth)
+            if (contactModel.dayOfBirth != null) {
+                txtBirthday?.text = getString(R.string.fragment_contact_details_birthday, contactDayOfBirth, contactMonthOfBirth)
+            } else {
+                txtBirthday?.text = getString(R.string.fragment_contact_details_empty_birthday)
+                btnNotification?.visibility = View.GONE
+            }
+
+            imgContactAvatar?.setImageURI(contactModel.photo)
             rlContact?.visibility = View.VISIBLE
         }
     }
 
     override fun getContactData() {
         val weakFragment = WeakReference(this)
-        arguments?.getInt(ARGUMENT_ID)?.let {
+        arguments?.getString(ARGUMENT_ID)?.let {
             serviceOwner?.getService()?.getFullContactData(weakFragment, it)
         }
     }
 
-    private fun setNotification(intent: Intent, id: Int?) {
+    private fun setNotification(intent: Intent, id: String?) {
         val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pendingIntent = id?.let { it -> PendingIntent.getBroadcast(requireContext(), it, intent, 0) }
+        val pendingIntent = id?.let { it -> PendingIntent.getBroadcast(requireContext(), it.hashCode(), intent, 0) }
         if (contactMonthOfBirth != null && contactDayOfBirth != null) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, birthdayCalendar(dayOfBirth = contactDayOfBirth!!, monthOfBirth = contactMonthOfBirth!!).timeInMillis, pendingIntent)
         }
@@ -153,18 +166,17 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
         btnNotification?.text = getString(R.string.fragment_contact_delete_btn_txt)
     }
 
-    private fun deleteNotification(intent: Intent, id: Int?) {
+    private fun deleteNotification(intent: Intent, id: String?) {
         val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pendingIntent = id?.let { it -> PendingIntent.getBroadcast(requireContext(), it, intent, 0) }
+        val pendingIntent = id?.let { it -> PendingIntent.getBroadcast(requireContext(), it.hashCode(), intent, 0) }
         alarmManager.cancel(pendingIntent)
         pendingIntent?.cancel()
         btnNotification?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
         btnNotification?.text = getString(R.string.fragment_contact_add_btn_txt)
     }
 
-    private fun notificationStatus(id: Int?): Boolean {
-        val intent = Intent(requireContext(), AlarmReceiver::class.java)
-        val status = id?.let { PendingIntent.getBroadcast(requireContext(), it, intent, PendingIntent.FLAG_NO_CREATE) }
+    private fun notificationStatus(intent: Intent, id: String?): Boolean {
+        val status = id?.let { PendingIntent.getBroadcast(requireContext(), it.hashCode(), intent, PendingIntent.FLAG_NO_CREATE) }
         return status != null
     }
 
@@ -191,10 +203,10 @@ class ContactDetailsFragment : Fragment(), ContactServiceInterface {
 
     private fun getIntent(): Intent {
         val intent = Intent(requireContext(), AlarmReceiver::class.java)
-        val id = arguments?.getInt(ARGUMENT_ID)
+        val id = arguments?.getString(ARGUMENT_ID)
         intent.putExtra(ARGUMENT_ID, id)
         intent.putExtra(ARGUMENT_NAME, txtName?.text)
-        intent.action = ACTION
+        intent.action = getString(R.string.notification_action)
         return intent
     }
 }
