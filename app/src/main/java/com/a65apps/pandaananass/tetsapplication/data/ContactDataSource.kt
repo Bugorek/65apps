@@ -22,13 +22,16 @@ private const val SELECTION_BIRTHDAY = ContactsContract.Data.CONTACT_ID + "=?" +
         ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE +
         "' AND " + ContactsContract.CommonDataKinds.Event.TYPE +
         " = " + ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY
+private const val SELECTION_CONTACT_SEARCH = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " LIKE?" +
+        " OR " + ContactsContract.CommonDataKinds.Phone.NUMBER + " LIKE?"
+private const val SQL_SYMBOL = "%"
 private const val DATE_SEPARATOR = '-'
 private const val MAXIMUM_DAYS_OF_MONTH = 31
 
 object ContactDataSource {
     fun getContactDetails(context: Context, contactDetailsData: WeakReference<ContactDetailsData>, id: String) {
         Thread {
-            Thread.sleep(2000)
+            Thread.sleep(1500)
             val contactDetails = FullContactModel()
             context.contentResolver?.query(ContactsContract.Contacts.CONTENT_URI,
                     null,
@@ -37,13 +40,11 @@ object ContactDataSource {
                     null)
                     ?.use { contactCursor ->
                         if (contactCursor.moveToNext()) {
-                            val id = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts._ID))
-                            val photo = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id.toLong())
-                            contactDetails.id = id
                             contactDetails.name = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                            contactDetails.photo = Uri.withAppendedPath(photo, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
                         }
                     }
+            contactDetails.id = id
+            contactDetails.photo = getContactListPhoto(context = context, contactId = id)
             getContactNumber(context = context,contactDetails = contactDetails, id = id)
             getContactEmail(context = context,contactDetails = contactDetails, id = id)
             getContactNote(context = context,contactDetails = contactDetails, id = id)
@@ -126,41 +127,14 @@ object ContactDataSource {
                 }
     }
 
-    fun getContactList(context: Context, contactListData: WeakReference<ContactListData>){
+    fun getContactList(context: Context, contactListData: WeakReference<ContactListData>, query: String?){
         Thread {
-            Thread.sleep(2000)
-            val contactList = mutableListOf<ShortContactModel>()
-            context.contentResolver?.query(ContactsContract.Contacts.CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null)
-                    ?.use { contactCursor ->
-                        while (contactCursor.moveToNext()) {
-                            val id = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts._ID))
-                            val name = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                            val photo = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id.toLong())
-                            val photoPath = Uri.withAppendedPath(photo, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
-                            val uriNumber = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-                            var contactNumber: String? = null
-                            context.contentResolver.query(uriNumber,
-                                    null,
-                                    SELECTION_NUMBER,
-                                    Array(1) { id },
-                                    null)
-                                    ?.use { numberCursor ->
-                                        if (numberCursor.moveToNext()) {
-                                            val number = numberCursor.getString(numberCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                                            contactNumber = number
-                                        }
-                                    }
-                            contactList.add(ShortContactModel(id = id,
-                                    photo = photoPath,
-                                    name = name,
-                                    number = contactNumber))
-                        }
-                    }
-            contactListData.get()?.setContactData(contactList)
+            Thread.sleep(1500)
+            if (query != null) {
+                contactListData.get()?.setContactList(contactListWithQuery(context = context, query = query))
+            } else {
+                contactListData.get()?.setContactList(contactListWithoutQuery(context = context))
+            }
         }.start()
     }
 
@@ -170,4 +144,74 @@ object ContactDataSource {
             } catch (ex: Exception) {
                 listOf()
             }
+
+    private fun contactListWithQuery(context: Context, query: String): List<ShortContactModel> {
+        val contactList = mutableListOf<ShortContactModel>()
+        val newQuery = "$SQL_SYMBOL$query$SQL_SYMBOL"
+        context.contentResolver?.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null,
+                SELECTION_CONTACT_SEARCH,
+                arrayOf(newQuery, newQuery),
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                ?.use { contactCursor ->
+                    while (contactCursor.moveToNext()) {
+                        val id = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID))
+                        val name = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
+                        val contactNumber = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        val photoUri = getContactListPhoto(context = context, contactId = id)
+                        contactList.add(ShortContactModel(id = id,
+                                photo = photoUri,
+                                name = name,
+                                number = contactNumber))
+                    }
+                }
+        return contactList
+    }
+
+    private fun contactListWithoutQuery(context: Context): List<ShortContactModel> {
+        val contactList = mutableListOf<ShortContactModel>()
+        context.contentResolver?.query(ContactsContract.Contacts.CONTENT_URI,
+                null,
+                null,
+                null,
+                null)
+                ?.use { contactCursor ->
+                    while (contactCursor.moveToNext()) {
+                        val id = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts._ID))
+                        val name = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+                        var contactNumber: String? = null
+                        val photoUri = getContactListPhoto(context = context, contactId = id)
+                        context.contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                null,
+                                SELECTION_NUMBER,
+                                Array(1) { id },
+                                null)
+                                ?.use { numberCursor ->
+                                    if (numberCursor.moveToNext()) {
+                                        val number = numberCursor.getString(numberCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                                        contactNumber = number
+                                    }
+                                }
+                        contactList.add(ShortContactModel(id = id,
+                                photo = photoUri,
+                                name = name,
+                                number = contactNumber))
+                    }
+                }
+        return contactList
+    }
+
+    private fun getContactListPhoto(context: Context, contactId: String): Uri? {
+        val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId.toLong())
+        val photoPath = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+        var photoUri: Uri? = null
+        context.contentResolver.query(photoPath, arrayOf(ContactsContract.Contacts.Photo.PHOTO), null, null, null)
+                ?.use { photoCursor ->
+                    Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+                    if (photoCursor.moveToFirst()) {
+                        photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+                    }
+                }
+        return photoUri
+    }
 }

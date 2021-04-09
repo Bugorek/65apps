@@ -129,9 +129,11 @@ class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, Permi
     }
 
     override fun noBirthday() {
-        txtBirthday?.text = getString(R.string.fragment_contact_details_empty_birthday)
-        btnNotification?.visibility = View.GONE
-        rlContact?.visibility = View.VISIBLE
+        activity?.runOnUiThread {
+            txtBirthday?.text = getString(R.string.fragment_contact_details_empty_birthday)
+            btnNotification?.visibility = View.GONE
+            rlContact?.visibility = View.VISIBLE
+        }
     }
 
     override fun setBirthday(contactModel: FullContactModel) {
