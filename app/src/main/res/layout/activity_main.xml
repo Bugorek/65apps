@@ -19,7 +19,7 @@
             android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
-            app:titleTextColor="#fff"/>
+            app:titleTextColor="#fff" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout

@@ -41,6 +41,7 @@ dependencies {
     kapt 'tech.schoolhelper:moxy-x-compiler:1.7.0'
     implementation 'tech.schoolhelper:moxy-x-androidx:1.7.0'
 
+    implementation 'androidx.recyclerview:recyclerview:1.2.0'
     implementation "androidx.fragment:fragment-ktx:1.3.2"
     implementation "androidx.activity:activity-ktx:$activity_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

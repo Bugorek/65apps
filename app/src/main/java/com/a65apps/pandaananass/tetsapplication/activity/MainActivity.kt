@@ -10,11 +10,11 @@ import com.a65apps.pandaananass.tetsapplication.fragments.AlertDialogFragment
 import com.a65apps.pandaananass.tetsapplication.fragments.ContactListFragment
 import com.a65apps.pandaananass.tetsapplication.fragments.FRAGMENT_LIST_NAME
 import com.a65apps.pandaananass.tetsapplication.fragments.FRAGMENT_DETAILS_NAME
-import com.a65apps.pandaananass.tetsapplication.interfaces.RelativeLayoutClickListener
+import com.a65apps.pandaananass.tetsapplication.interfaces.OnContactClickListener
 
 private const val ARGUMENT_ID = "Id"
 
-class MainActivity : AppCompatActivity(), RelativeLayoutClickListener {
+class MainActivity : AppCompatActivity(), OnContactClickListener {
 
     private var permissionDialogFragment: AlertDialogFragment? = null
 
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), RelativeLayoutClickListener {
         supportFragmentManager.executePendingTransactions()
     }
 
-    override fun onLayoutClick(id: String) {
+    override fun onContactClickListener(id: String) {
         openContactDetails(id)
     }
 }
