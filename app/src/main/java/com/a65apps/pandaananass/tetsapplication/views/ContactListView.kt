@@ -9,6 +9,9 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 interface ContactListView: MvpView {
     fun getContactData()
     fun setContactData(contactModel: List<ShortContactModel>)
+    fun showLoader()
+    fun hideLoader()
+    fun showRequestError()
     fun setEmptyList()
     fun setNoPermission()
 }

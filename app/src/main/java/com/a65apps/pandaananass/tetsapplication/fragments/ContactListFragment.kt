@@ -28,6 +28,7 @@ import com.a65apps.pandaananass.tetsapplication.util.ContactListDecorator
 import com.a65apps.pandaananass.tetsapplication.views.ContactListView
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
+import com.github.rahatarmanahmed.cpv.CircularProgressView
 
 const val FRAGMENT_LIST_NAME = "ContactListFragment"
 
@@ -41,6 +42,8 @@ class ContactListFragment: MvpAppCompatFragment(), ContactListView, PermissionDi
     private var contactAdapter: ContactListAdapter? = null
     private var txtNoPermission: TextView? = null
     private var txtEmptyList: TextView? = null
+    private var cpvWait: CircularProgressView? = null
+    private var txtRequestError: TextView? = null
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             contactListPresenter.getContactData(context = requireContext())
@@ -82,6 +85,8 @@ class ContactListFragment: MvpAppCompatFragment(), ContactListView, PermissionDi
         txtNoPermission = view.findViewById(R.id.txt_contact_list_no_permission)
         txtEmptyList = view.findViewById(R.id.txt_contact_list_empty_list)
         rvContact = view.findViewById(R.id.recycler_contact)
+        cpvWait = view.findViewById(R.id.cpv_contact_list)
+        txtRequestError = view.findViewById(R.id.txt_contact_list_request_error)
         contactAdapter = ContactListAdapter { contact ->
             contact.id?.let { contactClickListener?.onContactClickListener(it) }
         }
@@ -100,6 +105,8 @@ class ContactListFragment: MvpAppCompatFragment(), ContactListView, PermissionDi
         rvContact?.adapter = null
         rvContact = null
         contactAdapter = null
+        cpvWait = null
+        txtRequestError = null
         super.onDestroyView()
     }
 
@@ -131,17 +138,25 @@ class ContactListFragment: MvpAppCompatFragment(), ContactListView, PermissionDi
     }
 
     override fun setContactData(contactModel: List<ShortContactModel>) {
-        activity?.runOnUiThread {
-            txtEmptyList?.visibility = View.GONE
-            contactAdapter?.submitList(contactModel)
-        }
+        txtEmptyList?.visibility = View.GONE
+        contactAdapter?.submitList(contactModel)
+    }
+
+    override fun showLoader() {
+        cpvWait?.visibility = View.VISIBLE
+    }
+
+    override fun hideLoader() {
+        cpvWait?.visibility = View.GONE
+    }
+
+    override fun showRequestError() {
+        txtRequestError?.visibility = View.VISIBLE
     }
 
     override fun setEmptyList() {
-        activity?.runOnUiThread {
-            contactAdapter?.submitList(mutableListOf())
-            txtEmptyList?.visibility = View.VISIBLE
-        }
+        contactAdapter?.submitList(mutableListOf())
+        txtEmptyList?.visibility = View.VISIBLE
     }
 
     override fun setNoPermission() {

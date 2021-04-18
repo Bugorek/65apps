@@ -5,11 +5,9 @@ import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.core.text.isDigitsOnly
-import com.a65apps.pandaananass.tetsapplication.interfaces.ContactDetailsData
-import com.a65apps.pandaananass.tetsapplication.interfaces.ContactListData
 import com.a65apps.pandaananass.tetsapplication.models.FullContactModel
 import com.a65apps.pandaananass.tetsapplication.models.ShortContactModel
-import java.lang.ref.WeakReference
+import io.reactivex.rxjava3.core.Single
 
 private const val SELECTION_CONTACTS = ContactsContract.Contacts._ID + " =?"
 private const val SELECTION_NUMBER = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " =?"
@@ -29,28 +27,28 @@ private const val DATE_SEPARATOR = '-'
 private const val MAXIMUM_DAYS_OF_MONTH = 31
 
 object ContactDataSource {
-    fun getContactDetails(context: Context, contactDetailsData: WeakReference<ContactDetailsData>, id: String) {
-        Thread {
+    fun getContactDetails(context: Context, id: String): Single<FullContactModel> {
+        return Single.fromCallable {
             Thread.sleep(1500)
             val contactDetails = FullContactModel()
             context.contentResolver?.query(ContactsContract.Contacts.CONTENT_URI,
-                    null,
-                    SELECTION_CONTACTS,
-                    Array(1) { id },
-                    null)
-                    ?.use { contactCursor ->
-                        if (contactCursor.moveToNext()) {
-                            contactDetails.name = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                        }
+                null,
+                SELECTION_CONTACTS,
+                Array(1) { id },
+                null)
+                ?.use { contactCursor ->
+                    if (contactCursor.moveToNext()) {
+                        contactDetails.name = contactCursor.getString(contactCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
                     }
+                }
             contactDetails.id = id
             contactDetails.photo = getContactListPhoto(context = context, contactId = id)
             getContactNumber(context = context,contactDetails = contactDetails, id = id)
             getContactEmail(context = context,contactDetails = contactDetails, id = id)
             getContactNote(context = context,contactDetails = contactDetails, id = id)
             getContactBirthday(context = context,contactDetails = contactDetails, id = id)
-            contactDetailsData.get()?.setContactData(contactDetails)
-        }.start()
+            contactDetails
+        }
     }
 
     private fun getContactNumber(context: Context,contactDetails: FullContactModel, id: String) {
@@ -127,16 +125,15 @@ object ContactDataSource {
                 }
     }
 
-    fun getContactList(context: Context, contactListData: WeakReference<ContactListData>, query: String?){
-        Thread {
-            Thread.sleep(1500)
-            if (query != null) {
-                contactListData.get()?.setContactList(contactListWithQuery(context = context, query = query))
-            } else {
-                contactListData.get()?.setContactList(contactListWithoutQuery(context = context))
+    fun getContactList(context: Context, query: String?): Single<List<ShortContactModel>> =
+            Single.fromCallable {
+                Thread.sleep(1500)
+                if (query != null) {
+                contactListWithQuery(context = context, query = query)
+                } else {
+                    contactListWithoutQuery(context = context)
+                }
             }
-        }.start()
-    }
 
     private fun dateConversion(dateString: String): List<Int> =
             try {

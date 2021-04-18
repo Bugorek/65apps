@@ -16,7 +16,9 @@ import com.a65apps.pandaananass.tetsapplication.receivers.AlarmReceiver
 import com.a65apps.pandaananass.tetsapplication.views.ContactDetailsView
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
-import java.lang.ref.WeakReference
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
@@ -26,9 +28,27 @@ private const val ARGUMENT_NAME = "Name"
 
 @InjectViewState
 class ContactDetailsPresenter: MvpPresenter<ContactDetailsView>(), ContactDetailsData {
+    private val compositeDisposable = CompositeDisposable()
+
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
+    }
+
     fun getContactData(context: Context, id: String) {
-        val weakReference = WeakReference<ContactDetailsData>(this)
-        ContactDataSource.getContactDetails(context = context, contactDetailsData = weakReference, id = id)
+        ContactDataSource.getContactDetails(context = context, id = id)
+        compositeDisposable.add(ContactDataSource.getContactDetails(
+            context = context,
+            id = id)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { viewState.showLoader() }
+            .doFinally { viewState.hideLoader() }
+            .subscribe({
+               setContactData(contactModel = it)
+            }, {
+                viewState.showRequestError()
+            }))
     }
 
     override fun setContactData(contactModel: FullContactModel) {

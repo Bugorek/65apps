@@ -7,4 +7,5 @@
     <dimen name="contact_name_text">22sp</dimen>
     <dimen name="contact_info_text">18sp</dimen>
     <dimen name="contact_list_padding">6dp</dimen>
+    <dimen name="loader_size">28dp</dimen>
 </resources>

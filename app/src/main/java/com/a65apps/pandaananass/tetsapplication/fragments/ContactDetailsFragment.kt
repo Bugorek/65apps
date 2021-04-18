@@ -23,6 +23,7 @@ import com.a65apps.pandaananass.tetsapplication.presenters.ContactDetailsPresent
 import com.a65apps.pandaananass.tetsapplication.views.ContactDetailsView
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
+import com.github.rahatarmanahmed.cpv.CircularProgressView
 
 private const val ARGUMENT_ID = "Id"
 const val FRAGMENT_DETAILS_NAME = "ContactDetailsFragment"
@@ -45,6 +46,8 @@ class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, Permi
     private var txtNoPermission: TextView? = null
     private var contactMonthOfBirth: Int? = null
     private var contactDayOfBirth: Int? = null
+    private var cpvWait: CircularProgressView? = null
+    private var txtRequestError: TextView? = null
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             val contactId = arguments?.getString(ARGUMENT_ID)
@@ -90,6 +93,8 @@ class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, Permi
         imgContactAvatar = view.findViewById(R.id.img_contact_avatar)
         btnNotification = view.findViewById(R.id.btn_contact_notification)
         txtNoPermission = view.findViewById(R.id.txt_contact_details_no_permission)
+        cpvWait = view.findViewById(R.id.cpv_contact_details)
+        txtRequestError = view.findViewById(R.id.txt_contact_list_request_error)
         txtDescription?.movementMethod = ScrollingMovementMethod()
         mainActivity.title = resources.getString(R.string.fragment_contact_details_title)
         getPermission()
@@ -107,6 +112,8 @@ class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, Permi
         txtNoPermission = null
         contactMonthOfBirth = null
         contactDayOfBirth = null
+        cpvWait = null
+        txtRequestError = null
         super.onDestroyView()
     }
 
@@ -114,6 +121,18 @@ class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, Permi
         arguments?.getString(ARGUMENT_ID)?.let {
             contactDetailsPresenter.getContactData(requireContext(), id = it)
         }
+    }
+
+    override fun showLoader() {
+        cpvWait?.visibility = View.VISIBLE
+    }
+
+    override fun hideLoader() {
+        cpvWait?.visibility = View.GONE
+    }
+
+    override fun showRequestError() {
+        txtRequestError?.visibility = View.VISIBLE
     }
 
     override fun setContactData(contactModel: FullContactModel) {
