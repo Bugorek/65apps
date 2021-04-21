@@ -2,8 +2,6 @@ package com.a65apps.pandaananass.tetsapplication.presenters
 
 import android.app.Activity
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
 import com.a65apps.pandaananass.tetsapplication.data.ContactDataSource
 import com.a65apps.pandaananass.tetsapplication.fragments.AlertDialogFragment
@@ -12,22 +10,51 @@ import com.a65apps.pandaananass.tetsapplication.interfaces.ContactListData
 import com.a65apps.pandaananass.tetsapplication.views.ContactListView
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
-import java.lang.ref.WeakReference
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import com.a65apps.pandaananass.tetsapplication.models.ShortContactModel as ShortContactModel
 
 @InjectViewState
 class ContactListPresenter: MvpPresenter<ContactListView>(), ContactListData {
+    private val compositeDisposable = CompositeDisposable()
+
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
+    }
+
     fun getContactData(context: Context) {
-        val weakReference = WeakReference<ContactListData>(this)
-        ContactDataSource.getContactList(context = context, contactListData = weakReference, query = null)
+        compositeDisposable.add(ContactDataSource.getContactList(
+            context = context,
+            query = null)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { viewState.showLoader() }
+            .doFinally { viewState.hideLoader() }
+            .subscribe({
+                setContactList(contactModel = it)
+            }, {
+                viewState.showRequestError()
+            }))
     }
 
     fun getContactDataWithQuery(context: Context, query: String) {
         if (query == "") {
             getContactData(context = context)
         } else {
-            val weakReference = WeakReference<ContactListData>(this)
-            ContactDataSource.getContactList(context = context, contactListData = weakReference, query = query)
+            compositeDisposable.add(ContactDataSource.getContactList(
+                context = context,
+                query = query)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { viewState.showLoader() }
+                .doFinally { viewState.hideLoader() }
+                .subscribe({
+                    setContactList(contactModel = it)
+                }, {
+                    viewState.showRequestError()
+                }))
         }
     }
 

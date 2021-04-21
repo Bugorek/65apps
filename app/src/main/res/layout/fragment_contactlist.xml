@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/contact_empty_list"
+        android:textSize="@dimen/contact_info_text"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        android:id="@+id/cpv_contact_list"
+        android:layout_width="@dimen/loader_size"
+        android:layout_height="@dimen/loader_size"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:cpv_animAutostart="true"
+        app:cpv_color="@color/colorPrimary"
+        app:cpv_indeterminate="true" />
+
+    <TextView
+        android:id="@+id/txt_contact_list_request_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/contact_list_request_error"
         android:textSize="@dimen/contact_info_text"
         android:layout_centerInParent="true"
         android:visibility="gone"/>
