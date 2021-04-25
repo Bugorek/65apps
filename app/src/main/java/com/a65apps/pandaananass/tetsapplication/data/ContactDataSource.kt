@@ -5,9 +5,12 @@ import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.core.text.isDigitsOnly
+import com.a65apps.pandaananass.tetsapplication.interfaces.ContactDetailsOwner
+import com.a65apps.pandaananass.tetsapplication.interfaces.ContactListOwner
 import com.a65apps.pandaananass.tetsapplication.models.FullContactModel
 import com.a65apps.pandaananass.tetsapplication.models.ShortContactModel
 import io.reactivex.rxjava3.core.Single
+import javax.inject.Inject
 
 private const val SELECTION_CONTACTS = ContactsContract.Contacts._ID + " =?"
 private const val SELECTION_NUMBER = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " =?"
@@ -26,8 +29,9 @@ private const val SQL_SYMBOL = "%"
 private const val DATE_SEPARATOR = '-'
 private const val MAXIMUM_DAYS_OF_MONTH = 31
 
-object ContactDataSource {
-    fun getContactDetails(context: Context, id: String): Single<FullContactModel> {
+class ContactDataSource
+    @Inject constructor(): ContactListOwner, ContactDetailsOwner {
+    override fun getContactDetails(context: Context, id: String): Single<FullContactModel> {
         return Single.fromCallable {
             Thread.sleep(1500)
             val contactDetails = FullContactModel()
@@ -125,7 +129,7 @@ object ContactDataSource {
                 }
     }
 
-    fun getContactList(context: Context, query: String?): Single<List<ShortContactModel>> =
+    override fun getContactList(context: Context, query: String?): Single<List<ShortContactModel>> =
             Single.fromCallable {
                 Thread.sleep(1500)
                 if (query != null) {

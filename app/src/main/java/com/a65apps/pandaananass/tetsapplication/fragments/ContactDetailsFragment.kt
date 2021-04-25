@@ -1,6 +1,7 @@
 package com.a65apps.pandaananass.tetsapplication.fragments
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -17,19 +18,24 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
+import com.a65apps.pandaananass.tetsapplication.app.AppDelegate
 import com.a65apps.pandaananass.tetsapplication.interfaces.PermissionDialogClickListener
 import com.a65apps.pandaananass.tetsapplication.models.FullContactModel
 import com.a65apps.pandaananass.tetsapplication.presenters.ContactDetailsPresenter
 import com.a65apps.pandaananass.tetsapplication.views.ContactDetailsView
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
+import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.github.rahatarmanahmed.cpv.CircularProgressView
+import javax.inject.Inject
+import javax.inject.Provider
 
 private const val ARGUMENT_ID = "Id"
 const val FRAGMENT_DETAILS_NAME = "ContactDetailsFragment"
 
 class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, PermissionDialogClickListener {
-
+    @Inject
+    lateinit var contactDetailsPresenterProvider: Provider<ContactDetailsPresenter>
     @InjectPresenter
     lateinit var contactDetailsPresenter: ContactDetailsPresenter
 
@@ -69,6 +75,14 @@ class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, Permi
             contactDetailsFragment.arguments = args
             return contactDetailsFragment
         }
+    }
+
+    override fun onAttach(context: Context) {
+        val appDelegate = requireActivity().application as AppDelegate
+        val contactDataComponent = appDelegate.getAppComponent()
+            ?.plusContactDetailsComponent()
+        contactDataComponent?.inject(contactDetailsFragment = this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -214,5 +228,10 @@ class ContactDetailsFragment : MvpAppCompatFragment(), ContactDetailsView, Permi
                 }
             }
         }
+    }
+
+    @ProvidePresenter
+    fun providePresenter(): ContactDetailsPresenter {
+        return contactDetailsPresenterProvider.get()
     }
 }

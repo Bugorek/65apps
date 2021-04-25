@@ -3,20 +3,21 @@ package com.a65apps.pandaananass.tetsapplication.presenters
 import android.app.Activity
 import android.content.Context
 import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
-import com.a65apps.pandaananass.tetsapplication.data.ContactDataSource
 import com.a65apps.pandaananass.tetsapplication.fragments.AlertDialogFragment
 import com.a65apps.pandaananass.tetsapplication.fragments.PERMISSION_DIALOG_NAME
 import com.a65apps.pandaananass.tetsapplication.interfaces.ContactListData
+import com.a65apps.pandaananass.tetsapplication.interfaces.ContactListOwner
 import com.a65apps.pandaananass.tetsapplication.views.ContactListView
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import javax.inject.Inject
 import com.a65apps.pandaananass.tetsapplication.models.ShortContactModel as ShortContactModel
 
 @InjectViewState
-class ContactListPresenter: MvpPresenter<ContactListView>(), ContactListData {
+class ContactListPresenter @Inject constructor(private val contactDataSource: ContactListOwner): MvpPresenter<ContactListView>(), ContactListData {
     private val compositeDisposable = CompositeDisposable()
 
     override fun onDestroy() {
@@ -25,7 +26,7 @@ class ContactListPresenter: MvpPresenter<ContactListView>(), ContactListData {
     }
 
     fun getContactData(context: Context) {
-        compositeDisposable.add(ContactDataSource.getContactList(
+        compositeDisposable.add(contactDataSource.getContactList(
             context = context,
             query = null)
             .subscribeOn(Schedulers.io())
@@ -43,7 +44,7 @@ class ContactListPresenter: MvpPresenter<ContactListView>(), ContactListData {
         if (query == "") {
             getContactData(context = context)
         } else {
-            compositeDisposable.add(ContactDataSource.getContactList(
+            compositeDisposable.add(contactDataSource.getContactList(
                 context = context,
                 query = query)
                 .subscribeOn(Schedulers.io())

@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.Intent
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
-import com.a65apps.pandaananass.tetsapplication.data.ContactDataSource
 import com.a65apps.pandaananass.tetsapplication.fragments.AlertDialogFragment
 import com.a65apps.pandaananass.tetsapplication.fragments.PERMISSION_DIALOG_NAME
 import com.a65apps.pandaananass.tetsapplication.interfaces.ContactDetailsData
+import com.a65apps.pandaananass.tetsapplication.interfaces.ContactDetailsOwner
 import com.a65apps.pandaananass.tetsapplication.models.FullContactModel
 import com.a65apps.pandaananass.tetsapplication.receivers.AlarmReceiver
 import com.a65apps.pandaananass.tetsapplication.views.ContactDetailsView
@@ -22,12 +22,13 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
+import javax.inject.Inject
 
 private const val ARGUMENT_ID = "Id"
 private const val ARGUMENT_NAME = "Name"
 
 @InjectViewState
-class ContactDetailsPresenter: MvpPresenter<ContactDetailsView>(), ContactDetailsData {
+class ContactDetailsPresenter @Inject constructor(private val contactDataSource: ContactDetailsOwner): MvpPresenter<ContactDetailsView>(), ContactDetailsData {
     private val compositeDisposable = CompositeDisposable()
 
     override fun onDestroy() {
@@ -36,8 +37,8 @@ class ContactDetailsPresenter: MvpPresenter<ContactDetailsView>(), ContactDetail
     }
 
     fun getContactData(context: Context, id: String) {
-        ContactDataSource.getContactDetails(context = context, id = id)
-        compositeDisposable.add(ContactDataSource.getContactDetails(
+        contactDataSource.getContactDetails(context = context, id = id)
+        compositeDisposable.add(contactDataSource.getContactDetails(
             context = context,
             id = id)
             .subscribeOn(Schedulers.io())
