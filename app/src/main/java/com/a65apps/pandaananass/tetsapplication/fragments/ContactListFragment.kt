@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.activity.MainActivity
 import com.a65apps.pandaananass.tetsapplication.adapters.ContactListAdapter
+import com.a65apps.pandaananass.tetsapplication.app.AppDelegate
 import com.a65apps.pandaananass.tetsapplication.interfaces.PermissionDialogClickListener
 import com.a65apps.pandaananass.tetsapplication.interfaces.OnContactClickListener
 import com.a65apps.pandaananass.tetsapplication.models.ShortContactModel
@@ -28,12 +29,16 @@ import com.a65apps.pandaananass.tetsapplication.util.ContactListDecorator
 import com.a65apps.pandaananass.tetsapplication.views.ContactListView
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
+import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.github.rahatarmanahmed.cpv.CircularProgressView
+import javax.inject.Inject
+import javax.inject.Provider
 
 const val FRAGMENT_LIST_NAME = "ContactListFragment"
 
 class ContactListFragment: MvpAppCompatFragment(), ContactListView, PermissionDialogClickListener {
-
+    @Inject
+    lateinit var contactListPresenterProvider: Provider<ContactListPresenter>
     @InjectPresenter
     lateinit var contactListPresenter: ContactListPresenter
 
@@ -63,6 +68,10 @@ class ContactListFragment: MvpAppCompatFragment(), ContactListView, PermissionDi
     }
 
     override fun onAttach(context: Context) {
+        val appDelegate = requireActivity().application as AppDelegate
+        val contactDataComponent = appDelegate.getAppComponent()
+            ?.plusContactListComponent()
+        contactDataComponent?.inject(contactListFragment = this)
         super.onAttach(context)
         if (context is OnContactClickListener) {
             contactClickListener = context
@@ -188,5 +197,10 @@ class ContactListFragment: MvpAppCompatFragment(), ContactListView, PermissionDi
                 }
             }
         }
+    }
+
+    @ProvidePresenter
+    fun providePresenter(): ContactListPresenter {
+        return contactListPresenterProvider.get()
     }
 }
