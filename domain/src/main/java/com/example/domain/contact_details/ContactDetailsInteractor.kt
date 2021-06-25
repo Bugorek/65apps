@@ -4,6 +4,6 @@ import io.reactivex.rxjava3.core.Single
 
 interface ContactDetailsInteractor {
     fun getContactData(id: String): Single<FullContactModel>
-    fun setNotification(id: String?, contactName: String, monthOfBirth: Int?, dayOfBirth: Int?)
-    fun deleteNotification(id: String?, contactName: String)
+    fun notificationClick(id: String?, contactName: String?, monthOfBirth: Int?, dayOfBirth: Int?)
+    fun notificationStatus(id: String?, contactName: String?): Boolean?
 }

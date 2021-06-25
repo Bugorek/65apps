@@ -182,7 +182,6 @@ class ContactDetailsFragment : MvpAppCompatFragment(),
                 ?: throw IllegalArgumentException("contact id is required")
             btnNotification?.setOnClickListener {
                 contactDetailsPresenter.notificationClick(
-                    context = requireContext(),
                     contactId = contactId,
                     contactName = txtName?.text.toString(),
                     monthOfBirth = contactModel.monthOfBirth,
@@ -190,7 +189,6 @@ class ContactDetailsFragment : MvpAppCompatFragment(),
                 )
             }
             contactDetailsPresenter.notificationButtonStyle(
-                context = requireContext(),
                 contactId = contactId,
                 contactName = txtName?.text.toString()
             )

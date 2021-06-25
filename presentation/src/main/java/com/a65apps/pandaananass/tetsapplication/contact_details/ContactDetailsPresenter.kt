@@ -18,9 +18,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-private const val ARGUMENT_ID = "Id"
-private const val ARGUMENT_NAME = "Name"
-
 @InjectViewState
 class ContactDetailsPresenter(private val contactDetailsModel: ContactDetailsInteractor) :
     MvpPresenter<ContactDetailsView>(),
@@ -58,49 +55,22 @@ class ContactDetailsPresenter(private val contactDetailsModel: ContactDetailsInt
     }
 
     fun notificationClick(
-        context: Context,
         contactId: String?,
-        contactName: String,
+        contactName: String?,
         monthOfBirth: Int?,
         dayOfBirth: Int?
     ) {
-        val intent = getIntent(
-            context = context,
-            contactId = contactId,
-            contactName = contactName
-        )
-        if (notificationStatus(
-                intent = intent,
-                id = contactId,
-                context = context
-            )
-        ) {
-            deleteNotification(id = contactId, contactName = contactName)
-        } else {
-            setNotification(
-                id = contactId,
-                contactName = contactName,
-                monthOfBirth = monthOfBirth,
-                dayOfBirth = dayOfBirth
-            )
-        }
+        if(contactDetailsModel.notificationStatus(id = contactId, contactName = contactName) == false) {
+            viewState.notificationSet()
+        } else viewState.notificationNotSet()
+        contactDetailsModel.notificationClick(id = contactId, contactName = contactName, monthOfBirth = monthOfBirth, dayOfBirth = dayOfBirth)
     }
 
     fun notificationButtonStyle(
-        context: Context,
         contactId: String?,
         contactName: String
     ) {
-        val intent = getIntent(
-            context = context,
-            contactId = contactId,
-            contactName = contactName
-        )
-        if (notificationStatus(
-                intent = intent,
-                id = contactId,
-                context = context
-            )
+        if (contactDetailsModel.notificationStatus(id = contactId, contactName = contactName) == true
         ) {
             viewState.notificationSet()
         } else {
@@ -134,52 +104,5 @@ class ContactDetailsPresenter(private val contactDetailsModel: ContactDetailsInt
 
     fun setNoPermission() {
         viewState.setNoPermission()
-    }
-
-    private fun getIntent(
-        context: Context,
-        contactId: String?,
-        contactName: String
-    ) =
-        Intent(context, AlarmReceiver::class.java).apply {
-            putExtra(ARGUMENT_ID, contactId)
-            putExtra(ARGUMENT_NAME, contactName)
-            action = context.getString(R.string.notification_action)
-        }
-
-    private fun notificationStatus(
-        intent: Intent,
-        id: String?,
-        context: Context
-    ): Boolean {
-        val status = id?.let {
-            PendingIntent.getBroadcast(
-                context,
-                it.hashCode(),
-                intent,
-                PendingIntent.FLAG_NO_CREATE
-            )
-        }
-        return status != null
-    }
-
-    private fun setNotification(
-        id: String?,
-        contactName: String,
-        monthOfBirth: Int?,
-        dayOfBirth: Int?
-    ) {
-        contactDetailsModel.setNotification(
-            id = id,
-            contactName = contactName,
-            monthOfBirth = monthOfBirth,
-            dayOfBirth = dayOfBirth
-        )
-        viewState.notificationSet()
-    }
-
-    private fun deleteNotification(id: String?, contactName: String) {
-        contactDetailsModel.deleteNotification(id = id, contactName = contactName)
-        viewState.notificationNotSet()
     }
 }
