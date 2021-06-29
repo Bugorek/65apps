@@ -2,11 +2,9 @@ package com.a65apps.pandaananass.tetsapplication
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.Context
-import com.example.domain.contact_details.BirthdayNotification
-import com.example.domain.contact_details.FullContactModel
-import com.example.domain.contact_list.ShortContactModel
-import java.util.*
+import com.example.domain.contactDetails.BirthdayNotification
+import com.example.domain.contactDetails.FullContactModel
+import java.util.Calendar
 
 class BirthdayNotificationHelperPlug(
     private val pendingIntent: PendingIntent,
@@ -15,10 +13,7 @@ class BirthdayNotificationHelperPlug(
     private val notificationList = mutableListOf<FullContactModel>()
 
     override fun setNotification(
-        id: String?,
-        contactName: String?,
-        monthOfBirth: Int?,
-        dayOfBirth: Int?,
+        contactModel: FullContactModel,
         nextBirthday: Calendar
     ) {
         alarmManager.setExact(
@@ -26,7 +21,7 @@ class BirthdayNotificationHelperPlug(
             nextBirthday.timeInMillis,
             pendingIntent
         )
-        notificationList.add(FullContactModel(id = id))
+        notificationList.add(FullContactModel(contactModel.id))
     }
 
     override fun deleteNotification(id: String?, contactName: String?) {
@@ -34,13 +29,6 @@ class BirthdayNotificationHelperPlug(
         pendingIntent.cancel()
     }
 
-    override fun notificationStatus(id: String?, contactName: String?): Boolean {
-        var status: Boolean? = null
-        notificationList.forEach {
-            if (it.id == id) {
-                status = true
-            }
-        }
-        return status != null
-    }
+    override fun notificationStatus(id: String?, contactName: String?) =
+        notificationList.singleOrNull { it.id == id } != null
 }

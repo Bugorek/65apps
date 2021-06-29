@@ -1,18 +1,19 @@
 package com.example.domain
 
-import com.example.domain.birthday_notification.BirthdayNotificationInteractor
-import com.example.domain.birthday_notification.BirthdayNotificationModel
-import com.example.domain.birthday_notification.CalendarDataProvider
-import com.example.domain.birthday_notification.CalendarRepository
-import com.example.domain.contact_details.BirthdayNotification
-import com.example.domain.contact_details.FullContactModel
+import com.example.domain.birthdayNotification.BirthdayNotificationInteractor
+import com.example.domain.birthdayNotification.BirthdayNotificationModel
+import com.example.domain.birthdayNotification.CalendarDataProvider
+import com.example.domain.birthdayNotification.CalendarRepository
+import com.example.domain.contactDetails.BirthdayNotification
+import com.example.domain.contactDetails.FullContactModel
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.`verify`
 import org.mockito.junit.MockitoJUnitRunner
-import java.util.*
+import java.util.Calendar
 
 @RunWith(MockitoJUnitRunner::class)
 class BirthdayNotificationModelTest {
@@ -20,26 +21,24 @@ class BirthdayNotificationModelTest {
     private lateinit var birthdayNotificationHelper: BirthdayNotification
     private lateinit var calendarDataProvider: CalendarRepository
     private lateinit var birthdayNotificationModel: BirthdayNotificationInteractor
-    private var contact =
-        FullContactModel(id = "1", name = "Иван Иванович", monthOfBirth = 9, dayOfBirth = 8)
+    private var contact = FullContactModel(
+        id = "1",
+        name = "Иван Иванович",
+        monthOfBirth = 9,
+        dayOfBirth = 8
+    )
 
     @Before
     fun before() {
         calendarDataProvider = CalendarDataProvider()
         birthdayNotificationModel =
-            BirthdayNotificationModel(
-                birthdayNotificationHelper = birthdayNotificationHelper,
-                calendarDataProvider = calendarDataProvider
-            )
+            BirthdayNotificationModel(birthdayNotificationHelper, calendarDataProvider)
     }
 
     @Test
     fun createUncreatedNotificationForTheNextYear() {
         `when`(
-            birthdayNotificationHelper.notificationStatus(
-                id = contact.id,
-                contactName = contact.name
-            )
+            birthdayNotificationHelper.notificationStatus(contact.id, contact.name)
         ).thenReturn(false)
         calendarDataProvider.setDate(day = 9, month = Calendar.SEPTEMBER, year = 1999)
         val nextBirthday = Calendar.getInstance().apply {
@@ -48,28 +47,14 @@ class BirthdayNotificationModelTest {
             set(Calendar.DAY_OF_MONTH, 8)
             set(Calendar.MILLISECOND, 0)
         }
-        birthdayNotificationModel.notificationClick(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
-        verify(birthdayNotificationHelper).setNotification(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth,
-            nextBirthday = nextBirthday
-        )
+        birthdayNotificationModel.notificationClick(contact)
+        verify(birthdayNotificationHelper).setNotification(contact, nextBirthday)
     }
 
     @Test
     fun createUncreatedNotificationForTheCurrentYear() {
         `when`(
-            birthdayNotificationHelper.notificationStatus(
-                id = contact.id,
-                contactName = contact.name
-            )
+            birthdayNotificationHelper.notificationStatus(contact.id, contact.name)
         ).thenReturn(false)
         calendarDataProvider.setDate(day = 7, month = Calendar.SEPTEMBER, year = 1999)
         val nextBirthday = Calendar.getInstance().apply {
@@ -78,48 +63,23 @@ class BirthdayNotificationModelTest {
             set(Calendar.DAY_OF_MONTH, 8)
             set(Calendar.MILLISECOND, 0)
         }
-        birthdayNotificationModel.notificationClick(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
-        verify(birthdayNotificationHelper).setNotification(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth,
-            nextBirthday = nextBirthday
-        )
+        birthdayNotificationModel.notificationClick(contact)
+        verify(birthdayNotificationHelper).setNotification(contact, nextBirthday)
     }
 
     @Test
     fun deleteTheCreatedNotification() {
         `when`(
-            birthdayNotificationHelper.notificationStatus(
-                id = contact.id,
-                contactName = contact.name
-            )
+            birthdayNotificationHelper.notificationStatus(contact.id, contact.name)
         ).thenReturn(true)
-        birthdayNotificationModel.notificationClick(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
-        verify(birthdayNotificationHelper).deleteNotification(
-            id = contact.id,
-            contactName = contact.name
-        )
+        birthdayNotificationModel.notificationClick(contact)
+        verify(birthdayNotificationHelper).deleteNotification(contact.id, contact.name)
     }
 
     @Test
     fun addNotificationForPersonBornOnFebruaryTwentyNinthForTheNextYear() {
         `when`(
-            birthdayNotificationHelper.notificationStatus(
-                id = contact.id,
-                contactName = contact.name
-            )
+            birthdayNotificationHelper.notificationStatus(contact.id, contact.name)
         ).thenReturn(false)
         contact =
             FullContactModel(id = "1", name = "Иван Иванович", monthOfBirth = 2, dayOfBirth = 29)
@@ -130,28 +90,14 @@ class BirthdayNotificationModelTest {
             set(Calendar.DAY_OF_MONTH, 29)
             set(Calendar.MILLISECOND, 0)
         }
-        birthdayNotificationModel.notificationClick(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
-        verify(birthdayNotificationHelper).setNotification(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth,
-            nextBirthday = nextBirthday
-        )
+        birthdayNotificationModel.notificationClick(contact)
+        verify(birthdayNotificationHelper).setNotification(contact, nextBirthday)
     }
 
     @Test
     fun addNotificationForPersonBornOnFebruaryTwentyNinthInFourYears() {
         `when`(
-            birthdayNotificationHelper.notificationStatus(
-                id = contact.id,
-                contactName = contact.name
-            )
+            birthdayNotificationHelper.notificationStatus(contact.id, contact.name)
         ).thenReturn(false)
         contact =
             FullContactModel(id = "1", name = "Иван Иванович", monthOfBirth = 2, dayOfBirth = 29)
@@ -162,18 +108,7 @@ class BirthdayNotificationModelTest {
             set(Calendar.DAY_OF_MONTH, 29)
             set(Calendar.MILLISECOND, 0)
         }
-        birthdayNotificationModel.notificationClick(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
-        verify(birthdayNotificationHelper).setNotification(
-            id = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth,
-            nextBirthday = nextBirthday
-        )
+        birthdayNotificationModel.notificationClick(contact)
+        verify(birthdayNotificationHelper).setNotification(contact, nextBirthday)
     }
 }

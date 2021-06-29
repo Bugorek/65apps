@@ -2,26 +2,23 @@ package com.a65apps.pandaananass.tetsapplication
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import com.a65apps.pandaananass.tetsapplication.contact_details.BirthdayNotificationHelper
-import com.a65apps.pandaananass.tetsapplication.contact_details.ContactDetailsPresenter
-import com.a65apps.pandaananass.tetsapplication.receivers.AlarmReceiver
-import com.a65apps.pandaananass.tetsapplication.repository.ContactDataSource
-import com.example.domain.birthday_notification.BirthdayNotificationInteractor
-import com.example.domain.birthday_notification.BirthdayNotificationModel
-import com.example.domain.birthday_notification.CalendarDataProvider
-import com.example.domain.birthday_notification.CalendarRepository
-import com.example.domain.contact_details.*
+import com.a65apps.pandaananass.tetsapplication.contactDetails.ContactDetailsPresenter
+import com.example.domain.birthdayNotification.BirthdayNotificationInteractor
+import com.example.domain.birthdayNotification.BirthdayNotificationModel
+import com.example.domain.birthdayNotification.CalendarDataProvider
+import com.example.domain.birthdayNotification.CalendarRepository
+import com.example.domain.contactDetails.BirthdayNotification
+import com.example.domain.contactDetails.ContactDetailsInteractor
+import com.example.domain.contactDetails.ContactDetailsModel
+import com.example.domain.contactDetails.ContactDetailsOwner
+import com.example.domain.contactDetails.FullContactModel
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
-import java.util.*
+import java.util.Calendar
 
 @RunWith(MockitoJUnitRunner::class)
 class BirthdayNotificationModelTest {
@@ -40,25 +37,21 @@ class BirthdayNotificationModelTest {
     private lateinit var contactDetailsModel: ContactDetailsInteractor
     private lateinit var birthdayNotificationModel: BirthdayNotificationInteractor
     private lateinit var birthdayNotificationHelper: BirthdayNotification
-    private var contact =
-        FullContactModel(id = "1", name = "Иван Иванович", monthOfBirth = 9, dayOfBirth = 8)
+    private var contact = FullContactModel(
+        id = "1",
+        name = "Иван Иванович",
+        monthOfBirth = 9,
+        dayOfBirth = 8
+    )
 
     @Before
     fun before() {
-        birthdayNotificationHelper = BirthdayNotificationHelperPlug(
-            pendingIntent = pendingIntent,
-            alarmManager = alarmManager
-        )
+        birthdayNotificationHelper = BirthdayNotificationHelperPlug(pendingIntent, alarmManager)
         calendarDataProvider = CalendarDataProvider()
-        birthdayNotificationModel = BirthdayNotificationModel(
-            birthdayNotificationHelper = birthdayNotificationHelper,
-            calendarDataProvider = calendarDataProvider
-        )
-        contactDetailsModel = ContactDetailsModel(
-            contactDataSource = contactDataSource,
-            birthdayNotificationModel = birthdayNotificationModel
-        )
-        contactDetailsPresenter = ContactDetailsPresenter(contactDetailsModel = contactDetailsModel)
+        birthdayNotificationModel =
+            BirthdayNotificationModel(birthdayNotificationHelper, calendarDataProvider)
+        contactDetailsModel = ContactDetailsModel(contactDataSource, birthdayNotificationModel)
+        contactDetailsPresenter = ContactDetailsPresenter(contactDetailsModel)
     }
 
     @Test
@@ -70,12 +63,7 @@ class BirthdayNotificationModelTest {
             set(Calendar.DAY_OF_MONTH, 8)
             set(Calendar.MILLISECOND, 0)
         }
-        contactDetailsPresenter.notificationClick(
-            contactId = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
+        contactDetailsPresenter.notificationClick(contact)
         verify(alarmManager).setExact(
             AlarmManager.RTC_WAKEUP,
             nextBirthday.timeInMillis,
@@ -92,12 +80,7 @@ class BirthdayNotificationModelTest {
             set(Calendar.DAY_OF_MONTH, 8)
             set(Calendar.MILLISECOND, 0)
         }
-        contactDetailsPresenter.notificationClick(
-            contactId = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
+        contactDetailsPresenter.notificationClick(contact)
         verify(alarmManager).setExact(
             AlarmManager.RTC_WAKEUP,
             nextBirthday.timeInMillis,
@@ -108,18 +91,8 @@ class BirthdayNotificationModelTest {
     @Test
     fun deleteTheCreatedNotification() {
         calendarDataProvider.setDate(day = 7, month = Calendar.SEPTEMBER, year = 1999)
-        contactDetailsPresenter.notificationClick(
-            contactId = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
-        contactDetailsPresenter.notificationClick(
-            contactId = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
+        contactDetailsPresenter.notificationClick(contact)
+        contactDetailsPresenter.notificationClick(contact)
         verify(alarmManager).cancel(pendingIntent)
     }
 
@@ -134,12 +107,7 @@ class BirthdayNotificationModelTest {
             set(Calendar.DAY_OF_MONTH, 29)
             set(Calendar.MILLISECOND, 0)
         }
-        contactDetailsPresenter.notificationClick(
-            contactId = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
+        contactDetailsPresenter.notificationClick(contact)
         verify(alarmManager).setExact(
             AlarmManager.RTC_WAKEUP,
             nextBirthday.timeInMillis,
@@ -158,12 +126,7 @@ class BirthdayNotificationModelTest {
             set(Calendar.DAY_OF_MONTH, 29)
             set(Calendar.MILLISECOND, 0)
         }
-        contactDetailsPresenter.notificationClick(
-            contactId = contact.id,
-            contactName = contact.name,
-            monthOfBirth = contact.monthOfBirth,
-            dayOfBirth = contact.dayOfBirth
-        )
+        contactDetailsPresenter.notificationClick(contact)
         verify(alarmManager).setExact(
             AlarmManager.RTC_WAKEUP,
             nextBirthday.timeInMillis,

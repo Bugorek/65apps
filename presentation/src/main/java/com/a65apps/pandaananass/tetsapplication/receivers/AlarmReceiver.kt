@@ -1,11 +1,11 @@
 package com.a65apps.pandaananass.tetsapplication.receivers
 
 import android.app.AlarmManager
+import android.app.Notification
 import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
-import android.app.NotificationManager
-import android.app.Notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
@@ -19,8 +19,11 @@ import java.util.Calendar
 
 private const val ARGUMENT_ID = "Id"
 private const val ARGUMENT_NAME = "Name"
-private const val CHANEL_ID = "chanelID"
-private const val CHANEL_NAME = "chanelName"
+private const val CHANNEL_ID = "channelID"
+private const val CHANNEL_NAME = "channelName"
+private const val LEAP_YEAR_DAY = 366
+private const val NOT_LEAP_YEAR_DAY = 365
+private const val COEFFICIENT_LEAP_YEAR = 4
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -61,15 +64,15 @@ class AlarmReceiver : BroadcastReceiver() {
 
     private fun birthdayCalendar(): Calendar {
         val year = Calendar.getInstance().get(Calendar.YEAR)
-        val countYearDay: Int = if (year % 4 == 0) {
-            366
+        val countYearDay: Int = if (year % COEFFICIENT_LEAP_YEAR == 0) {
+            LEAP_YEAR_DAY
         } else {
-            365
+            NOT_LEAP_YEAR_DAY
         }
         return Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
             set(Calendar.DAY_OF_YEAR, countYearDay)
-            set(Calendar.HOUR, 10)
+            set(Calendar.HOUR, 0)
             set(Calendar.MINUTE, 0)
         }
     }
@@ -77,8 +80,8 @@ class AlarmReceiver : BroadcastReceiver() {
     private fun createChanel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                CHANEL_ID,
-                CHANEL_NAME, NotificationManager.IMPORTANCE_DEFAULT
+                CHANNEL_ID,
+                CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT
             )
             val manager =
                 context.applicationContext?.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -93,7 +96,7 @@ class AlarmReceiver : BroadcastReceiver() {
     ): Notification {
         return NotificationCompat.Builder(
             context,
-            CHANEL_ID
+            CHANNEL_ID
         )
             .setSmallIcon(R.drawable.ic_stat_name)
             .setContentTitle(context.getString(R.string.notification_title))
