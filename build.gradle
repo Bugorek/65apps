@@ -3,7 +3,7 @@ buildscript {
     ext.kotlin_version = "1.4.30"
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.1.1"
@@ -14,10 +14,17 @@ buildscript {
     }
 }
 
+plugins {
+    id("io.gitlab.arturbosch.detekt").version("1.17.1")
+    id "org.jlleitschuh.gradle.ktlint" version "10.1.0"
+}
+
 allprojects {
+    apply plugin: "org.jlleitschuh.gradle.ktlint"
+    apply from: "$rootDir/detekt.gradle"
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 

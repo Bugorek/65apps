@@ -1,6 +1,6 @@
 package com.a65apps.pandaananass.tetsapplication.api
 
-import com.a65apps.pandaananass.tetsapplication.contact_details.ContactDetailsFragment
+import com.a65apps.pandaananass.tetsapplication.contactDetails.ContactDetailsFragment
 
 interface ContactDetailsContainer {
     fun inject(contactDetailsFragment: ContactDetailsFragment)
