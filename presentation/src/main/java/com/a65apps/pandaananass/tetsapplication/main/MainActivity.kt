@@ -5,15 +5,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentTransaction
 import com.a65apps.pandaananass.tetsapplication.R
-import com.a65apps.pandaananass.tetsapplication.contact_details.ContactDetailsFragment
 import com.a65apps.pandaananass.tetsapplication.common.AlertDialogFragment
-import com.a65apps.pandaananass.tetsapplication.contact_list.ContactListFragment
-import com.a65apps.pandaananass.tetsapplication.contact_list.FRAGMENT_LIST_NAME
-import com.a65apps.pandaananass.tetsapplication.contact_details.FRAGMENT_DETAILS_NAME
+import com.a65apps.pandaananass.tetsapplication.contactDetails.ContactDetailsFragment
+import com.a65apps.pandaananass.tetsapplication.contactDetails.FRAGMENT_DETAILS_NAME
+import com.a65apps.pandaananass.tetsapplication.contactList.ContactListFragment
+import com.a65apps.pandaananass.tetsapplication.contactList.FRAGMENT_LIST_NAME
 
 private const val ARGUMENT_ID = "Id"
 
-class MainActivity : AppCompatActivity(),
+class MainActivity :
+    AppCompatActivity(),
     OnContactClickListener {
 
     private var permissionDialogFragment: AlertDialogFragment? = null

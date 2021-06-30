@@ -11,6 +11,12 @@ java {
 dependencies {
     //RxJava
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
+    implementation 'junit:junit:4.12'
+
+    //Test
+    api 'junit:junit:4.13.2'
+    api 'org.mockito:mockito-core:3.4.6'
+    api 'org.mockito:mockito-inline:2.23.4'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
