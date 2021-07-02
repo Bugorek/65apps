@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -20,7 +21,10 @@ import androidx.core.os.bundleOf
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.api.ComponentOwner
 import com.a65apps.pandaananass.tetsapplication.common.PermissionDialogClickListener
+import com.a65apps.pandaananass.tetsapplication.main.FragmentDelegate
+import com.a65apps.pandaananass.tetsapplication.main.FragmentOwner
 import com.a65apps.pandaananass.tetsapplication.main.MainActivity
+import com.a65apps.pandaananass.tetsapplication.main.OnContactClickListener
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
@@ -43,6 +47,7 @@ class ContactDetailsFragment :
     lateinit var contactDetailsPresenter: ContactDetailsPresenter
 
     private var contactLayout: RelativeLayout? = null
+    private var fragmentOwner: FragmentOwner? = null
     private var txtName: TextView? = null
     private var txtFirstNumber: TextView? = null
     private var txtFirstMail: TextView? = null
@@ -51,6 +56,7 @@ class ContactDetailsFragment :
     private var txtDescription: TextView? = null
     private var txtBirthday: TextView? = null
     private var btnNotification: Button? = null
+    private var btnLocation: Button? = null
     private var imgContactAvatar: ImageView? = null
     private var txtNoPermission: TextView? = null
     private var contactMonthOfBirth: Int? = null
@@ -88,8 +94,15 @@ class ContactDetailsFragment :
         val appDelegate = requireActivity().application as? ComponentOwner
         val contactDataComponent = appDelegate?.getAppComponent()
             ?.contactDetailsFactory?.create()
-        contactDataComponent?.inject(contactDetailsFragment = this)
+        contactDataComponent?.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (requireActivity() as? AppCompatActivity)?.let {
+            fragmentOwner = FragmentDelegate(it)
+        }
     }
 
     override fun onCreateView(
@@ -114,10 +127,14 @@ class ContactDetailsFragment :
         txtBirthday = view.findViewById(R.id.txt_contact_birthday)
         imgContactAvatar = view.findViewById(R.id.img_contact_avatar)
         btnNotification = view.findViewById(R.id.btn_contact_notification)
+        btnLocation = view.findViewById(R.id.btn_contact_location)
         txtNoPermission = view.findViewById(R.id.txt_contact_details_no_permission)
         progressView = view.findViewById(R.id.cpv_contact_details)
         txtRequestError = view.findViewById(R.id.txt_contact_list_request_error)
         txtDescription?.movementMethod = ScrollingMovementMethod()
+        btnLocation?.setOnClickListener {
+            fragmentOwner?.openContactMap(contactId)
+        }
         mainActivity?.title = resources.getString(R.string.fragment_contact_details_title)
         contactDetailsPresenter.getPermission(
             contactId = contactId,
@@ -141,7 +158,14 @@ class ContactDetailsFragment :
         contactDayOfBirth = null
         progressView = null
         txtRequestError = null
+        btnNotification = null
+        btnLocation = null
         super.onDestroyView()
+    }
+
+    override fun onDetach() {
+        fragmentOwner = null
+        super.onDetach()
     }
 
     override fun getContactData() {

@@ -3,9 +3,12 @@
     <dimen name="contact_avatar_height">90dp</dimen>
     <dimen name="contact_avatar_width">80dp</dimen>
     <dimen name="contact_details_list_margin">10dp</dimen>
+    <dimen name="contact_details_separator_height">1dp</dimen>
     <dimen name="contact_main_info_margin">16dp</dimen>
     <dimen name="contact_name_text">22sp</dimen>
     <dimen name="contact_info_text">18sp</dimen>
     <dimen name="contact_list_padding">6dp</dimen>
     <dimen name="loader_size">28dp</dimen>
+    <dimen name="contact_map_direction_text">18sp</dimen>
+    <dimen name="contact_map_padding">10dp</dimen>
 </resources>

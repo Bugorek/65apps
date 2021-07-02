@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_contact"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/txt_contact_list_no_permission"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/no_permission_message"
-        android:textSize="@dimen/contact_info_text"
-        android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        style="@style/contact_list_error_style"
+        android:text="@string/no_permission_message" />
 
     <TextView
         android:id="@+id/txt_contact_list_empty_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/contact_empty_list"
-        android:textSize="@dimen/contact_info_text"
-        android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        style="@style/contact_list_error_style"
+        android:text="@string/contact_empty_list" />
 
     <com.github.rahatarmanahmed.cpv.CircularProgressView
         android:id="@+id/cpv_contact_list"
@@ -40,11 +32,7 @@
 
     <TextView
         android:id="@+id/txt_contact_list_request_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/contact_list_request_error"
-        android:textSize="@dimen/contact_info_text"
-        android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        style="@style/contact_list_error_style"
+        android:text="@string/contact_list_request_error" />
 
 </RelativeLayout>

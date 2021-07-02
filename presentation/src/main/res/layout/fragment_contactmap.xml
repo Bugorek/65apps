@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/contact_map_padding">
+
+    <TextView
+        android:id="@+id/txt_map_direction"
+        style="@style/contact_map_attributes_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/contact_map_direction" />
+
+    <TextView
+        android:id="@+id/txt_map_direction_text"
+        style="@style/contact_map_attributes_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_map_direction"
+        android:gravity="center"
+        android:text="@string/contact_map_direction_default" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/contact_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btn_contact_map_save"
+        android:layout_below="@+id/txt_map_direction_text"
+        tools:context=".main.MainActivity" />
+
+    <Button
+        android:id="@+id/btn_contact_map_save"
+        style="@style/contact_map_attributes_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/fragment_contact_map_add_btn_name" />
+
+</RelativeLayout>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="contact_details_attributes_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/contact_info_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="contact_details_separator_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/contact_details_separator_height</item>
+        <item name="android:background">@color/black</item>
+        <item name="android:textSize">@dimen/contact_info_text</item>
+    </style>
+
+    <style name="contact_details_button_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/contact_info_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="contact_details_error_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:textSize">@dimen/contact_info_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="contact_list_error_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:textSize">@dimen/contact_info_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="contact_map_attributes_style">
+        <item name="android:textSize">@dimen/contact_map_direction_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+</resources>

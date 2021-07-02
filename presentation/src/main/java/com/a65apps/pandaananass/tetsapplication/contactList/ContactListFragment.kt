@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -11,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
@@ -19,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.api.ComponentOwner
 import com.a65apps.pandaananass.tetsapplication.common.PermissionDialogClickListener
+import com.a65apps.pandaananass.tetsapplication.main.FragmentDelegate
 import com.a65apps.pandaananass.tetsapplication.main.MainActivity
 import com.a65apps.pandaananass.tetsapplication.main.OnContactClickListener
 import com.arellomobile.mvp.MvpAppCompatFragment
@@ -79,13 +82,13 @@ class ContactListFragment :
             ?.contactListFactory?.create()
         contactDataComponent?.inject(contactListFragment = this)
         super.onAttach(context)
-        if (context is OnContactClickListener) {
-            contactClickListener = context
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (requireActivity() as? AppCompatActivity)?.let {
+            contactClickListener = FragmentDelegate(it)
+        }
         contactsListDecorator = ContactsListDecorator(
             resources.getDimensionPixelSize(R.dimen.contact_list_padding),
             resources.getDimensionPixelSize(R.dimen.contact_list_padding)
@@ -114,7 +117,9 @@ class ContactListFragment :
             ContactsListAdapter { contact ->
                 contact.id?.let { contactClickListener?.onContactClickListener(it) }
             }
-        contactsListDecorator?.let { contactsRecycler?.addItemDecoration(it) }
+        contactsListDecorator?.let {
+            contactsRecycler?.addItemDecoration(it)
+        }
         contactsRecycler?.adapter = contactsAdapter
         contactsRecycler?.layoutManager = LinearLayoutManager(requireContext())
         contactsRecycler?.setHasFixedSize(true)
@@ -133,7 +138,6 @@ class ContactListFragment :
         progressView = null
         txtRequestError = null
         contactsAdapter = null
-        contactsListDecorator = null
         super.onDestroyView()
     }
 
