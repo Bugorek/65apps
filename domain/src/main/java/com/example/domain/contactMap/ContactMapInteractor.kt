@@ -5,7 +5,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 
 interface ContactMapInteractor {
-    fun getContactAddress(latitude: Double, longitude: Double): Observable<ContactAddress>
+    fun getContactAddress(latitude: Double, longitude: Double): Observable<ContactAddress?>
 
     fun saveContactData(contact: SimpleMapData): Completable
 

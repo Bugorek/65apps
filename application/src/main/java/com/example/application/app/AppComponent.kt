@@ -2,9 +2,11 @@ package com.example.application.app
 
 import android.content.Context
 import com.a65apps.pandaananass.tetsapplication.api.AppContainer
+import com.a65apps.pandaananass.tetsapplication.api.ContactRouteContainer
 import com.example.application.contactDetails.ContactDetailsComponent
 import com.example.application.contactList.ContactListComponent
 import com.example.application.contactMap.ContactMapComponent
+import com.example.application.contactRoute.ContactRouteComponent
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -17,6 +19,8 @@ interface AppComponent : AppContainer {
     override val contactListFactory: ContactListComponent.Factory
 
     override val contactMapFactory: ContactMapComponent.Factory
+
+    override val contactRouteFactory: ContactRouteComponent.Factory
 
     @Component.Factory
     interface Factory : AppContainer.Factory {

@@ -2,16 +2,17 @@ package com.a65apps.pandaananass.tetsapplication.contactMap
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.api.ComponentOwner
+import com.a65apps.pandaananass.tetsapplication.main.FragmentDelegate
 import com.a65apps.pandaananass.tetsapplication.main.FragmentOwner
 import com.a65apps.pandaananass.tetsapplication.main.MainActivity
 import com.arellomobile.mvp.MvpAppCompatFragment
@@ -25,8 +26,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -40,9 +39,11 @@ class ContactMapFragment : MvpAppCompatFragment(), ContactMapView, OnMapReadyCal
     @InjectPresenter
     lateinit var contactMapPresenter: ContactMapPresenter
 
+    private var fragmentOwner: FragmentOwner? = null
     private var locationText: TextView? = null
     private var contactMap: GoogleMap? = null
     private var btnSaveDirection: Button? = null
+    private var btnSetRoute: Button? = null
     private var mapDataEntity: SimpleMapData? = null
 
     companion object {
@@ -62,6 +63,13 @@ class ContactMapFragment : MvpAppCompatFragment(), ContactMapView, OnMapReadyCal
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (requireActivity() as? AppCompatActivity)?.let {
+            fragmentOwner = FragmentDelegate(it)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -77,6 +85,10 @@ class ContactMapFragment : MvpAppCompatFragment(), ContactMapView, OnMapReadyCal
         mainActivity?.title = getString(R.string.fragment_contact_map_title)
         locationText = view.findViewById(R.id.txt_map_direction_text)
         btnSaveDirection = view.findViewById(R.id.btn_contact_map_save)
+        btnSetRoute = view.findViewById(R.id.btn_contact_route)
+        btnSetRoute?.setOnClickListener {
+            contactId?.let { id -> fragmentOwner?.openContactRoute(id) }
+        }
         contactId?.let {
             contactMapPresenter.getContact(it)
         }
@@ -106,11 +118,12 @@ class ContactMapFragment : MvpAppCompatFragment(), ContactMapView, OnMapReadyCal
 
     override fun setContact(contact: SimpleMapData?) {
         val mapFragment =
-            childFragmentManager.findFragmentById(R.id.contact_map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+            childFragmentManager.findFragmentById(R.id.contact_map) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
         contact?.let {
             mapDataEntity = contact
             locationText?.text = contact.address
+            btnSetRoute?.visibility = View.VISIBLE
         }
         setSaveButtonModel(contact)
     }
@@ -185,6 +198,7 @@ class ContactMapFragment : MvpAppCompatFragment(), ContactMapView, OnMapReadyCal
             btnSaveDirection?.setOnClickListener {
                 mapDataEntity?.let { data ->
                     contactMapPresenter.saveContactData(data)
+                    btnSetRoute?.visibility = View.VISIBLE
                 }
             }
         }

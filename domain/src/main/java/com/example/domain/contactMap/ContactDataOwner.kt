@@ -9,4 +9,6 @@ interface ContactDataOwner {
     fun updateContact(contact: SimpleMapData): Completable
 
     fun getContactById(contactId: String): Single<SimpleMapData>
+
+    fun getAllContact(): Single<List<SimpleMapData>>
 }

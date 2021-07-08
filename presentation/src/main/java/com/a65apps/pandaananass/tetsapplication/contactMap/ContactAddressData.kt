@@ -11,8 +11,14 @@ class ContactAddressData(private val context: Context, private val geocodingApi:
     override fun getContactAddress(
         latitude: Double,
         longitude: Double
-    ): Observable<ContactAddress> = geocodingApi.getAddress(
+    ): Observable<ContactAddress?> = geocodingApi.getAddress(
         context.resources.getString(R.string.google_maps_key),
         "$latitude,$longitude"
-    ).map { ContactAddress(it.result[0].formattedAddress) }
+    ).map {
+        if (it.result.isNotEmpty()) {
+            ContactAddress(it.result[0].formattedAddress)
+        } else {
+            null
+        }
+    }
 }

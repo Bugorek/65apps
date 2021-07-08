@@ -6,7 +6,7 @@ class ContactMapModel(
     private val contactAddressOwner: ContactAddressOwner,
     private val contactDataOwner: ContactDataOwner
 ) : ContactMapInteractor {
-    override fun getContactAddress(latitude: Double, longitude: Double): Observable<ContactAddress> =
+    override fun getContactAddress(latitude: Double, longitude: Double): Observable<ContactAddress?> =
         contactAddressOwner.getContactAddress(latitude, longitude)
 
     override fun saveContactData(contact: SimpleMapData) = contactDataOwner.addContact(contact)

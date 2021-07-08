@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/contact_route_padding">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/contact_route_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:context=".main.MainActivity" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_destination"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        android:id="@+id/cpv_contact_route"
+        android:layout_width="@dimen/loader_size"
+        android:layout_height="@dimen/loader_size"
+        android:layout_centerInParent="true"
+        android:visibility="visible"
+        app:cpv_animAutostart="true"
+        app:cpv_color="@color/colorPrimary"
+        app:cpv_indeterminate="true" />
+
+    <TextView
+        android:id="@+id/txt_contact_route_empty_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/fragment_contact_route_empty_list"
+        android:textSize="@dimen/contact_info_text"
+        android:visibility="gone" />
+
+</RelativeLayout>

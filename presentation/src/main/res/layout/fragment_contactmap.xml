@@ -27,9 +27,18 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/btn_contact_map_save"
+        android:layout_above="@+id/btn_contact_route"
         android:layout_below="@+id/txt_map_direction_text"
         tools:context=".main.MainActivity" />
+
+    <Button
+        android:id="@+id/btn_contact_route"
+        style="@style/contact_details_button_style"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/btn_contact_map_save"
+        android:layout_marginTop="@dimen/contact_details_list_margin"
+        android:text="@string/fragment_contact_details_btn_route"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/btn_contact_map_save"

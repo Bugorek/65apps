@@ -15,4 +15,7 @@ interface MapDataDao {
 
     @Query("select * from contacts where id = :contactId")
     fun getContactById(contactId: String): MapDataEntity
+
+    @Query("SELECT * FROM contacts")
+    fun getAll(): List<MapDataEntity>
 }

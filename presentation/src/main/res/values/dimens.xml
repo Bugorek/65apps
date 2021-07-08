@@ -11,4 +11,6 @@
     <dimen name="loader_size">28dp</dimen>
     <dimen name="contact_map_direction_text">18sp</dimen>
     <dimen name="contact_map_padding">10dp</dimen>
+    <dimen name="contact_route_padding">10dp</dimen>
+    <dimen name="contact_route_list_padding">6dp</dimen>
 </resources>

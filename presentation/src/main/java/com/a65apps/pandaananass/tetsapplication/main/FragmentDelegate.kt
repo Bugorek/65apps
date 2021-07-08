@@ -1,7 +1,5 @@
 package com.a65apps.pandaananass.tetsapplication.main
 
-import android.app.Activity
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import com.a65apps.pandaananass.tetsapplication.R
@@ -11,6 +9,8 @@ import com.a65apps.pandaananass.tetsapplication.contactList.ContactListFragment
 import com.a65apps.pandaananass.tetsapplication.contactList.FRAGMENT_LIST_NAME
 import com.a65apps.pandaananass.tetsapplication.contactMap.ContactMapFragment
 import com.a65apps.pandaananass.tetsapplication.contactMap.FRAGMENT_MAP_NAME
+import com.a65apps.pandaananass.tetsapplication.contactRoute.ContactRouteFragment
+import com.a65apps.pandaananass.tetsapplication.contactRoute.FRAGMENT_ROUTE_NAME
 
 class FragmentDelegate(private val activity: AppCompatActivity) : FragmentOwner,
     OnContactClickListener {
@@ -42,6 +42,18 @@ class FragmentDelegate(private val activity: AppCompatActivity) : FragmentOwner,
             .replace(
                 R.id.fragment_container, ContactMapFragment.getNewInstance(id),
                 FRAGMENT_MAP_NAME
+            )
+            .addToBackStack(null)
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+        activity.supportFragmentManager.executePendingTransactions()
+    }
+
+    override fun openContactRoute(id: String) {
+        activity.supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.fragment_container, ContactRouteFragment.getNewInstance(id),
+                FRAGMENT_ROUTE_NAME
             )
             .addToBackStack(null)
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

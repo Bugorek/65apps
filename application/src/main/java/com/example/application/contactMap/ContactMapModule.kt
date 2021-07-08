@@ -16,20 +16,23 @@ import hu.akarnokd.rxjava3.retrofit.RxJava3CallAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+private const val BASE_URL = "https://maps.googleapis.com/"
+
 @Module
 class ContactMapModule {
     @Provides
     @ContactMapScope
+    @ContactMapRetrofit
     fun provideRetrofit(): Retrofit =
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://maps.googleapis.com/")
+            .baseUrl(BASE_URL)
             .build()
 
     @Provides
     @ContactMapScope
-    fun provideGeocodingApi(retrofit: Retrofit): GeocodingApi =
+    fun provideGeocodingApi(@ContactMapRetrofit retrofit: Retrofit): GeocodingApi =
         retrofit.create(GeocodingApi::class.java)
 
     @Provides
