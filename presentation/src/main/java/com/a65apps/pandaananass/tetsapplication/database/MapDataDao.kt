@@ -13,7 +13,7 @@ interface MapDataDao {
     @Update
     fun updateContact(contact: MapDataEntity)
 
-    @Query("select * from contacts where id = :contactId")
+    @Query("SELECT * FROM contacts WHERE id = :contactId")
     fun getContactById(contactId: String): MapDataEntity
 
     @Query("SELECT * FROM contacts")
