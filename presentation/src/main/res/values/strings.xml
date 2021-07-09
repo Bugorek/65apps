@@ -32,4 +32,8 @@
     <string name="fragment_contact_route_empty_list">Требуется назначить местоположение хотя бы еще одному контакту</string>
     <string name="fragment_contact_details_btn_route">Маршрут</string>
     <string name="fragment_contact_route_error">Ошибка при получении данных</string>
+    <string name="fragment_contacts_location_map_title">Местоположение</string>
+    <string name="fragment_contact_list_btn_text">Местоположение</string>
+    <string name="fragment_contact_location_error">Ошибка при получении данных</string>
+    <string name="fragment_contact_location_empty_list">Список пуст</string>
 </resources>

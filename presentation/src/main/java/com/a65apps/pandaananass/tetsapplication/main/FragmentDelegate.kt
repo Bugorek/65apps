@@ -11,6 +11,8 @@ import com.a65apps.pandaananass.tetsapplication.contactMap.ContactMapFragment
 import com.a65apps.pandaananass.tetsapplication.contactMap.FRAGMENT_MAP_NAME
 import com.a65apps.pandaananass.tetsapplication.contactRoute.ContactRouteFragment
 import com.a65apps.pandaananass.tetsapplication.contactRoute.FRAGMENT_ROUTE_NAME
+import com.a65apps.pandaananass.tetsapplication.contactsLocation.ContactsLocationFragment
+import com.a65apps.pandaananass.tetsapplication.contactsLocation.FRAGMENT_LOCATION_NAME
 
 class FragmentDelegate(private val activity: AppCompatActivity) : FragmentOwner,
     OnContactClickListener {
@@ -54,6 +56,18 @@ class FragmentDelegate(private val activity: AppCompatActivity) : FragmentOwner,
             .replace(
                 R.id.fragment_container, ContactRouteFragment.getNewInstance(id),
                 FRAGMENT_ROUTE_NAME
+            )
+            .addToBackStack(null)
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+        activity.supportFragmentManager.executePendingTransactions()
+    }
+
+    override fun openContactsLocation() {
+        activity.supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.fragment_container, ContactsLocationFragment.getNewInstance(),
+                FRAGMENT_LOCATION_NAME
             )
             .addToBackStack(null)
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

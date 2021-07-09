@@ -130,7 +130,7 @@ class ContactDetailsFragment :
         btnLocation = view.findViewById(R.id.btn_contact_location)
         txtNoPermission = view.findViewById(R.id.txt_contact_details_no_permission)
         progressView = view.findViewById(R.id.cpv_contact_details)
-        txtRequestError = view.findViewById(R.id.txt_contact_list_request_error)
+        txtRequestError = view.findViewById(R.id.txt_contact_details_request_error)
         txtDescription?.movementMethod = ScrollingMovementMethod()
         btnLocation?.setOnClickListener {
             fragmentOwner?.openContactMap(contactId)
@@ -177,6 +177,7 @@ class ContactDetailsFragment :
 
     override fun setContactData(contactModel: FullContactModel?) {
         if (contactModel == null) {
+            progressView?.visibility = View.VISIBLE
             txtRequestError?.visibility = View.VISIBLE
         } else {
             progressView?.visibility = View.GONE

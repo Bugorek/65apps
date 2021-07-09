@@ -25,6 +25,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import javax.inject.Inject
 import javax.inject.Provider
@@ -206,7 +207,17 @@ class ContactMapFragment : MvpAppCompatFragment(), ContactMapView, OnMapReadyCal
 
     private fun setMarker(contactMap: GoogleMap?, latitude: Double, longitude: Double) {
         contactMap?.clear()
-        contactMap?.animateCamera(CameraUpdateFactory.newLatLng(LatLng(latitude, longitude)));
+        val size = resources.displayMetrics.widthPixels
+        val latLngBuilder = LatLngBounds.Builder()
+        latLngBuilder.include(LatLng(latitude, longitude))
+        contactMap?.moveCamera(
+            CameraUpdateFactory.newLatLngBounds(
+                latLngBuilder.build(),
+                size,
+                size,
+                100
+            )
+        )
         contactMap?.addMarker(MarkerOptions().position(LatLng(latitude, longitude)))
     }
 }
