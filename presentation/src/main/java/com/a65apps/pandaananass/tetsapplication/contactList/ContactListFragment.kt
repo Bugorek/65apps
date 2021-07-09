@@ -4,13 +4,16 @@ import android.Manifest.permission
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
@@ -19,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.a65apps.pandaananass.tetsapplication.R
 import com.a65apps.pandaananass.tetsapplication.api.ComponentOwner
 import com.a65apps.pandaananass.tetsapplication.common.PermissionDialogClickListener
+import com.a65apps.pandaananass.tetsapplication.main.FragmentDelegate
+import com.a65apps.pandaananass.tetsapplication.main.FragmentOwner
 import com.a65apps.pandaananass.tetsapplication.main.MainActivity
 import com.a65apps.pandaananass.tetsapplication.main.OnContactClickListener
 import com.arellomobile.mvp.MvpAppCompatFragment
@@ -42,7 +47,9 @@ class ContactListFragment :
     lateinit var contactListPresenter: ContactListPresenter
 
     private var contactClickListener: OnContactClickListener? = null
+    private var fragmentOwner: FragmentOwner? = null
     private var contactsRecycler: RecyclerView? = null
+    private var btnContactsLocation: Button? = null
     private var contactsAdapter: ContactsListAdapter? = null
     private var txtNoPermission: TextView? = null
     private var txtEmptyList: TextView? = null
@@ -79,13 +86,14 @@ class ContactListFragment :
             ?.contactListFactory?.create()
         contactDataComponent?.inject(contactListFragment = this)
         super.onAttach(context)
-        if (context is OnContactClickListener) {
-            contactClickListener = context
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (requireActivity() as? AppCompatActivity)?.let {
+            contactClickListener = FragmentDelegate(it)
+            fragmentOwner = FragmentDelegate(it)
+        }
         contactsListDecorator = ContactsListDecorator(
             resources.getDimensionPixelSize(R.dimen.contact_list_padding),
             resources.getDimensionPixelSize(R.dimen.contact_list_padding)
@@ -108,13 +116,19 @@ class ContactListFragment :
         txtNoPermission = view.findViewById(R.id.txt_contact_list_no_permission)
         txtEmptyList = view.findViewById(R.id.txt_contact_list_empty_list)
         contactsRecycler = view.findViewById(R.id.recycler_contact)
+        btnContactsLocation = view.findViewById(R.id.btn_contact_list_location)
         progressView = view.findViewById(R.id.cpv_contact_list)
         txtRequestError = view.findViewById(R.id.txt_contact_list_request_error)
+        btnContactsLocation?.setOnClickListener {
+            fragmentOwner?.openContactsLocation()
+        }
         contactsAdapter =
             ContactsListAdapter { contact ->
                 contact.id?.let { contactClickListener?.onContactClickListener(it) }
             }
-        contactsListDecorator?.let { contactsRecycler?.addItemDecoration(it) }
+        contactsListDecorator?.let {
+            contactsRecycler?.addItemDecoration(it)
+        }
         contactsRecycler?.adapter = contactsAdapter
         contactsRecycler?.layoutManager = LinearLayoutManager(requireContext())
         contactsRecycler?.setHasFixedSize(true)
@@ -130,10 +144,10 @@ class ContactListFragment :
         txtEmptyList = null
         contactsRecycler?.adapter = null
         contactsRecycler = null
+        btnContactsLocation = null
         progressView = null
         txtRequestError = null
         contactsAdapter = null
-        contactsListDecorator = null
         super.onDestroyView()
     }
 

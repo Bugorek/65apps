@@ -10,59 +10,36 @@ import com.a65apps.pandaananass.tetsapplication.contactDetails.ContactDetailsFra
 import com.a65apps.pandaananass.tetsapplication.contactDetails.FRAGMENT_DETAILS_NAME
 import com.a65apps.pandaananass.tetsapplication.contactList.ContactListFragment
 import com.a65apps.pandaananass.tetsapplication.contactList.FRAGMENT_LIST_NAME
+import com.a65apps.pandaananass.tetsapplication.contactMap.ContactMapFragment
+import com.a65apps.pandaananass.tetsapplication.contactMap.FRAGMENT_MAP_NAME
+import kotlin.random.Random
 
 private const val ARGUMENT_ID = "Id"
 
-class MainActivity :
-    AppCompatActivity(),
-    OnContactClickListener {
+class MainActivity : AppCompatActivity() {
 
     private var permissionDialogFragment: AlertDialogFragment? = null
+    private var fragmentDelegate: FragmentOwner? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fragmentDelegate = FragmentDelegate(this)
         setContentView(R.layout.activity_main)
         val toolBar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolBar)
         val contactId = intent.getStringExtra(ARGUMENT_ID)
         if (savedInstanceState == null) {
-            openContactList()
+            fragmentDelegate?.openContactList()
         }
         contactId?.let {
-            openContactDetails(contactId)
+            fragmentDelegate?.openContactDetails(contactId)
             intent.removeExtra(ARGUMENT_ID)
         }
     }
 
     override fun onDestroy() {
         permissionDialogFragment = null
+        fragmentDelegate = null
         super.onDestroy()
-    }
-
-    override fun onContactClickListener(id: String) {
-        openContactDetails(id)
-    }
-
-    private fun openContactList() {
-        supportFragmentManager.beginTransaction()
-            .add(
-                R.id.fragment_container, ContactListFragment.getNewInstance(),
-                FRAGMENT_LIST_NAME
-            )
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            .commit()
-        supportFragmentManager.executePendingTransactions()
-    }
-
-    private fun openContactDetails(id: String) {
-        supportFragmentManager.beginTransaction()
-            .replace(
-                R.id.fragment_container, ContactDetailsFragment.getNewInstance(id),
-                FRAGMENT_DETAILS_NAME
-            )
-            .addToBackStack(null)
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            .commit()
-        supportFragmentManager.executePendingTransactions()
     }
 }

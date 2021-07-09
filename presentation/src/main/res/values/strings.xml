@@ -20,4 +20,19 @@
     <string name="search_title">Поиск</string>
     <string name="contact_details_request_error">Ошибка при загрузке данных</string>
     <string name="contact_list_request_error">Ошибка при загрузке данных</string>
+    <string name="contact_map_direction">Ваше местоположение: </string>
+    <string name="contact_map_direction_default">-</string>
+    <string name="fragment_contact_details_btn_location">Местоположение</string>
+    <string name="fragment_contact_map_title">Местоположение</string>
+    <string name="fragment_contact_map_add_btn_name">Сохранить</string>
+    <string name="fragment_contact_map_add_btn">Запись добавлена</string>
+    <string name="fragment_contact_map_update_btn">Запись обновлена</string>
+    <string name="fragment_contact_map_location_query_error">Ошибка при получении местоположения</string>
+    <string name="fragment_contact_map_data_error">Ошибка при сохранении данных</string>
+    <string name="fragment_contact_route_empty_list">Требуется назначить местоположение хотя бы еще одному контакту</string>
+    <string name="fragment_contact_details_btn_route">Маршрут</string>
+    <string name="fragment_contact_route_error">Ошибка при получении данных</string>
+    <string name="fragment_contacts_location_map_title">Местоположение</string>
+    <string name="fragment_contact_list_btn_text">Местоположение</string>
+    <string name="fragment_contact_location_error">Ошибка при получении данных</string>
 </resources>
