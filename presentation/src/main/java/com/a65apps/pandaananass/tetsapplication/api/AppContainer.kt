@@ -11,6 +11,8 @@ interface AppContainer {
 
     val contactRouteFactory: ContactRouteContainer.Factory
 
+    val contactsLocationFactory: ContactsLocationContainer.Factory
+
     interface Factory {
         fun create(context: Context): AppContainer
     }

@@ -5,4 +5,5 @@ interface FragmentOwner {
     fun openContactDetails(id: String)
     fun openContactMap(id: String?)
     fun openContactRoute(id: String)
+    fun openContactsLocation()
 }
