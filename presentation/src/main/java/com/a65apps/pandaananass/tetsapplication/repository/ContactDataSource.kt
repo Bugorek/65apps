@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
+import android.util.Log
 import androidx.core.text.isDigitsOnly
 import com.example.domain.contactDetails.ContactDetailsOwner
 import com.example.domain.contactDetails.FullContactModel
@@ -177,7 +178,6 @@ class ContactDataSource(private val context: Context) : ContactListOwner, Contac
         try {
             dateString.split(DATE_SEPARATOR).filter { it.isDigitsOnly() }.map { it.toInt() }
         } catch (ex: NumberFormatException) {
-            throw NumberFormatException(ex.message)
             listOf()
         }
 

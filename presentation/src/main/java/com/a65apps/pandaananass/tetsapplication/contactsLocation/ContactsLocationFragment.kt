@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentContainerView
 import com.a65apps.pandaananass.tetsapplication.R
@@ -39,6 +40,7 @@ class ContactsLocationFragment : MvpAppCompatFragment(), ContactsLocationView, O
     private var mapView: FragmentContainerView? = null
     private var progressView: CircularProgressView? = null
     private var contactMap: GoogleMap? = null
+    private var contactEmptyListMessage: TextView? = null
 
     companion object {
         fun getNewInstance(): ContactsLocationFragment =
@@ -70,12 +72,14 @@ class ContactsLocationFragment : MvpAppCompatFragment(), ContactsLocationView, O
         mainActivity?.title = getString(R.string.fragment_contacts_location_map_title)
         mapView = view.findViewById(R.id.contacts_location_map)
         progressView = view.findViewById(R.id.cpv_contacts_location)
+        contactEmptyListMessage = view.findViewById(R.id.txt_contacts_location_empty_list)
     }
 
     override fun onDestroyView() {
         mapView = null
         progressView = null
         contactMap = null
+        contactEmptyListMessage = null
         super.onDestroyView()
     }
 
@@ -85,24 +89,29 @@ class ContactsLocationFragment : MvpAppCompatFragment(), ContactsLocationView, O
     }
 
     override fun setContactsData(contacts: List<SimpleMapData>) {
-        val latLngBuilder = LatLngBounds.Builder()
-        contacts.forEach {
-            latLngBuilder.include(LatLng(it.latitude, it.longitude))
-            contactMap?.addMarker(
-                MarkerOptions().position(LatLng(it.latitude, it.longitude)).title(it.address)
-            )
-        }
-        val size = resources.displayMetrics.widthPixels
-        contactMap?.moveCamera(
-            CameraUpdateFactory.newLatLngBounds(
-                latLngBuilder.build(),
-                size,
-                size,
-                100
-            )
-        )
         progressView?.visibility = View.GONE
-        mapView?.visibility = View.VISIBLE
+        if (contacts.isNotEmpty()) {
+            val latLngBuilder = LatLngBounds.Builder()
+            contacts.forEach {
+                latLngBuilder.include(LatLng(it.latitude, it.longitude))
+                contactMap?.addMarker(
+                    MarkerOptions().position(LatLng(it.latitude, it.longitude)).title(it.address)
+                )
+            }
+            val size = resources.displayMetrics.widthPixels
+            contactMap?.moveCamera(
+                CameraUpdateFactory.newLatLngBounds(
+                    latLngBuilder.build(),
+                    size,
+                    size,
+                    100
+                )
+            )
+            mapView?.visibility = View.VISIBLE
+        }
+        else {
+            contactEmptyListMessage?.visibility = View.VISIBLE
+        }
     }
 
     override fun setContactListError() {

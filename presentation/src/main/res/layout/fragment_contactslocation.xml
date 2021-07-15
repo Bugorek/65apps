@@ -23,4 +23,9 @@
         app:cpv_color="@color/colorPrimary"
         app:cpv_indeterminate="true" />
 
+    <TextView
+        android:id="@+id/txt_contacts_location_empty_list"
+        style="@style/contacts_location_error_style"
+        android:text="@string/contact_empty_list" />
+
 </RelativeLayout>

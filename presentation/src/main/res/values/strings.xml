@@ -35,4 +35,5 @@
     <string name="fragment_contacts_location_map_title">Местоположение</string>
     <string name="fragment_contact_list_btn_text">Местоположение</string>
     <string name="fragment_contact_location_error">Ошибка при получении данных</string>
+    <string name="fragment_contact_location_empty_list">Список пуст</string>
 </resources>
